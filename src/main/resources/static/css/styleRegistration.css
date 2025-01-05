@@ -1,0 +1,190 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --app-bg-color: #f0f2f5;
+    --app-bg-color-lighter: #ffffff;
+    --app-bg-color-darker: #e6e7e8;
+    --app-font-color: #303035;
+    --app-font-family: 'Quicksand', sans-serif;
+    --app-acc-color: #1f89bf;
+    color: var(--app-font-color);
+    font-family: var(--app-font-family);
+    font-size: 10px;
+    font-weight: 400;
+    background-color: var(--app-bg-color);
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    height: 100%;
+}
+
+a,
+a:visited {
+    outline: none;
+    text-decoration: inherit;
+}
+
+a,
+a:visited {
+    color: inherit;
+}
+
+button {
+    border: none;
+    color: var(--app-font-color);
+    font-family: var(--app-font-family);
+    outline: none;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+#Page_topbar {
+    flex-shrink: 0;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+    align-items: center;
+    box-sizing: border-box;
+    display: flex;
+    width: 100%;
+    background-color: var(--app-bg-color-darker);
+}
+
+.Logo-small {
+    height: 4rem;
+}
+
+#container {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 4rem); /* Ustawienie wysokości z uwzględnieniem topbaru */
+    justify-content: center;
+    align-items: center;
+    padding: 2rem 0;
+}
+
+.PageContainer {
+    width: 100%;
+    max-width: 450px;
+    background-color: var(--app-bg-color-lighter);
+    padding: 2rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: auto 0; /* Wycentrowanie pionowe */
+    overflow-y: auto; /* Dodaj przewijanie w pionie */
+}
+
+.Registration-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.ContainerBox {
+    width: 100%;
+}
+
+.SignUp-Title {
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.SignUp-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.Input-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.Input_input {
+    padding: 1.5rem;
+    border: 1px solid var(--app-bg-color-darker);
+    border-radius: 0.5rem;
+    outline: none;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 1.2rem;
+}
+
+.SignUp-checkBox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.2rem;
+    color: var(--app-font-color);
+    cursor: pointer;
+    font-style: italic;
+    font-weight: 600;
+}
+
+.SignUp-checkBox input[type="checkbox"] {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.SignUp-formOptions {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.ButtonSignUp {
+    background-color: var(--app-acc-color);
+    color: #fff;
+    cursor: pointer;
+    border: none;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-family: var(--app-font-family);
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+.SignUp-optionlink {
+    text-align: center;
+    font-size: 1.2rem;
+}
+
+.Login-logo {
+    margin-top: 2rem;
+    height: 2rem;
+}
+
+.messages {
+    color: red;
+    font-weight: bold;
+    margin-top: 1.5rem;
+    font-size: 1.2rem;
+}
+
+footer {
+    text-align: left;
+    padding: 0.5rem;
+    background-color: var(--app-bg-color-darker);
+    color: var(--app-font-color);
+    flex-shrink: 0;
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    font-size: 1.2rem;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+footer p {
+    margin: 0;
+    padding-left: 10px;
+}

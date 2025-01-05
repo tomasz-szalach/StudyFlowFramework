@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pl">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="Manage your tasks">
+  <meta name="keywords" content="tasks, todo, list">
+  <title>StudyFlow</title>
+  <link rel="stylesheet" type="text/css" th:href="@{/css/stylehomePage.css}">
+  <script type="text/javascript" th:src="@{/js/logout.js}" defer></script>
+  <script type="text/javascript" th:src="@{/js/search.js}" defer></script>
+  <script type="text/javascript" th:src="@{/js/taskList.js}" defer></script>
+  <script type="text/javascript" th:src="@{/js/changePassword.js}" defer></script>
+</head>
+<body>
+<div id="TopBar">
+  <img class="logo" th:src="@{/img/logo.svg}" alt="Logo">
+  <div id="User-profile">
+    <div class="User-profile2">
+      <a th:href="@{/logout}" class="Logout">Wyloguj się</a>
+    </div>
+    <div class="User-profile2" th:onclick="window.location.href='@{/changePassword}'">
+      <span class="ChangePassword">Zmień hasło</span>
+    </div>
+  </div>
+</div>
+<div id="container-page">
+  <aside class="sidebar">
+    <div class="tasklist-display">
+      <h3>Twoje listy zadań</h3>
+      <div th:if="${taskLists}">
+        <div th:each="taskList, index : ${taskLists}">
+          <div class="home-blocks">
+            <a class="TASKLIST" th:classappend="${index == 0} ? 'selected'"
+               href="#" th:data-tasklist-id="${taskList.id}">
+              <div class="TASKLIST-choose">
+                <span class="tasklist-icon">&#x1F4CB;</span>
+                <div class="name" th:text="${taskList.name}"></div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+      <a class="add-tasklist" th:href="@{/addTaskList}">Dodaj nową listę zadań</a>
+    </div>
+  </aside>
+  <main class="main-content">
+    <div class="Page-Title-Bar">
+      <span class="page-title">Zadania <span th:text="${taskLists[0]?.name ?: ''}"></span></span>
+    </div>
+    <div class="search-bar">
+      <input id="search" placeholder="Znajdź zadanie">
+      <span class="search-icon">&#128269;</span>
+    </div>
+    <a class="create-task-button" th:href="@{/addTaskPage}">Utwórz nowe zadanie</a>
+    <section class="task-display">
+      <div th:if="${tasks}">
+        <div th:each="task : ${tasks}">
+          <div class="task-item" th:data-task-id="${task.id}">
+            <div class="task-header">
+              <input type="checkbox" class="task-checkbox" th:checked="${task.status == 'completed'}">
+              <div class="name" th:classappend="${task.status == 'completed'} ? 'completed'" th:text="${task.name}"></div>
+              <div class="due-date" th:text="${task.dueDate}"></div>
+              <div class="status" th:text="${task.status == 'completed' ? 'Zakończone' : 'Do zrobienia'}"></div>
+              <button class="delete-task-button">🗑️</button>
+            </div>
+            <div class="description" th:text="${task.description}"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<template id="task-template">
+  <div class="task-item" data-task-id="">
+    <div class="task-header">
+      <input type="checkbox" class="task-checkbox">
+      <div class="name">Task Name</div>
+      <div class="due-date">Due Date</div>
+      <div class="status">Status</div>
+      <button class="delete-task-button">🗑️</button>
+    </div>
+    <div class="description">Task Description</div>
+  </div>
+</template>
+
+<footer>
+  <p>&copy; 2024 StudyFlow</p>
+</footer>
+</body>
+</html>

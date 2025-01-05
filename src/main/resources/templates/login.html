@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Custom Login Page</title>
+</head>
+<body>
+<h1>Moja strona logowania</h1>
+
+<!-- Ponieważ w tym momencie NIE ustalamy loginProcessingUrl,
+     Spring Security domyślnie nasłuchuje na POST /login -->
+<form th:action="@{/login}" method="post">
+    <input type="text" name="username" placeholder="Nazwa użytkownika"/>
+    <input type="password" name="password" placeholder="Hasło"/>
+    <button type="submit">Zaloguj</button>
+</form>
+
+</body>
+</html>

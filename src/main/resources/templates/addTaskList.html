@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="Add a new task list">
+    <meta name="keywords" content="tasks, todo, list">
+    <title>StudyFlow - Add Task List</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/styleRegistration.css}">
+</head>
+<body>
+<div id="Page_topbar">
+    <img class="Logo-small" th:src="@{/img/logo.svg}">
+</div>
+<div id="container">
+    <div id="root">
+        <div class="PageContainer">
+            <section class="Registration-section">
+                <section class="ContainerBox">
+                    <h1 class="SignUp-Title">Dodaj nową listę zadań</h1>
+                    <form class="SignUp-form" th:action="@{/createTaskList}" method="POST">
+                        <div class="messages" th:if="${messages}">
+                            <p th:each="message : ${messages}" th:text="${message}"></p>
+                        </div>
+                        <div class="Input-container">
+                            <input class="Input_input" type="text" name="name" placeholder="Nazwa listy zadań" required>
+                        </div>
+                        <div class="SignUp-formOptions">
+                            <button class="ButtonSignUp" type="submit">
+                                Dodaj listę
+                            </button>
+                            <div class="SignUp-optionlink">
+                                <a th:href="@{/homePage}">Powrót</a>
+                            </div>
+                        </div>
+                    </form>
+                </section>
+                <img class="Login-logo" th:src="@{/img/logo.svg}">
+            </section>
+        </div>
+    </div>
+</div>
+</body>
+</html>

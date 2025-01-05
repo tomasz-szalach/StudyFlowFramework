@@ -1,0 +1,220 @@
+@import url(https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap);
+:root {
+    --app-bg-color: #272729;
+    --app-bg-color-ligther: #303035;
+    --app-bg-color-darker: #202020;
+    --app-font-color: #faf7ff;
+    --app-font-family: "Quicksand", sans-serif;
+    --app-acc-color: #8685ef;
+    color: #faf7ff;
+    color: var(--app-font-color);
+    font-family: Quicksand, sans-serif;
+    font-family: var(--app-font-family);
+    font-size: 10px;
+    font-weight: 400;
+    background-color: #272729;
+    padding-top: 0.5vh;
+}
+
+a, a:visited {
+    outline: none;
+    text-decoration: inherit
+}
+
+:link, a, a:visited {
+    color: inherit
+}
+
+#TopBar {
+    flex-shrink: 0;
+    justify-content: flex-end;
+    padding: 3rem 7rem;
+    position: relative;
+    z-index: 1;
+    align-items: center;
+    box-sizing: border-box;
+    display: flex;
+    width: 100%;
+}
+
+#User-profile {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    min-width: 0;
+    position: relative;
+    z-index: 100;
+}
+
+.User-profile2 {
+    align-items: center;
+    background-color: var(--app-bg-color-darker);
+    border-radius: 1.5rem;
+    box-shadow: -5px 5px 10px #1d1d1d33, 5px -5px 10px #1d1d1d33, -5px -5px 10px #232323e6, 5px 5px 13px #1d1d1de6, inset 1px 1px 2px #2323234d, inset -1px -1px 2px #1d1d1d80;
+    box-sizing: border-box;
+    display: flex;
+    gap: 1.5rem;
+    height: 8rem;
+    justify-content: flex-start;
+    min-width: 20rem;
+    padding: 0 1rem;
+    -webkit-user-select: none;
+    user-select: none;
+    width: 100%;
+}
+
+.User-profile-avatar {
+    border-radius: 55%;
+    height: 6rem;
+    width: 6rem;
+}
+
+.Logout {
+    font-size: 3.2rem;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: -webkit-fit-content;
+    width: -moz-fit-content;
+    width: fit-content;
+}
+
+.Page-Title-Bar {
+    box-sizing: border-box;
+    flex-shrink: 0;
+    font-size: 4.8rem;
+    font-weight: 600;
+    height: 8rem;
+    padding: 0 5rem;
+    width: 100%;
+}
+
+.Page-Title-Bar>span {
+    display: block;
+    width: 100%;
+    text-align: center;
+}
+
+#container-page {
+    display: flex;
+    justify-content: space-around;
+    flex-direction: row;
+    align-items: center;
+    border-radius: 1.5rem;
+    box-sizing: border-box;
+    height: 100%;
+    margin: 0 4.5rem;
+    width: calc(100% - 14rem);
+}
+
+.task-list-blocks {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.Task-list-container, .Task-container {
+    background-color: var(--app-bg-color);
+    border-radius: 1.5rem;
+    box-shadow: -5px 5px 10px #1d1d1d33, 5px -5px 10px #1d1d1d33, -5px -5px 10px #232323e6, 5px 5px 13px #1d1d1de6, inset 1px 1px 2px #2323234d, inset -1px -1px 2px #1d1d1d80;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem;
+    width: 48%;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+li {
+    background-color: var(--app-bg-color-darker);
+    border-radius: 1.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    cursor: pointer;
+}
+
+li:hover {
+    background-color: var(--app-bg-color-lighter);
+}
+
+button {
+    background-color: var(--app-acc-color);
+    border: none;
+    border-radius: 1.5rem;
+    box-shadow: -5px 5px 10px #1d1d1d33, 5px -5px 10px #1d1d1d33, -5px -5px 10px #232323e6, 5px 5px 13px #1d1d1de6, inset 1px 1px 2px #2323234d, inset -1px -1px 2px #1d1d1d80;
+    color: var(--app-font-color);
+    font-size: 2.4rem;
+    font-weight: 500;
+    height: 4rem;
+    margin-top: 2rem;
+    cursor: pointer;
+}
+
+footer {
+    margin: 15px 0;
+}
+
+.ButtonBack {
+    background-color: var(--app-acc-color);
+    border: none;
+    border-radius: 1.5rem;
+    box-shadow: -5px 5px 10px #1d1d1d33, 5px -5px 10px #1d1d1d33, -5px -5px 10px #232323e6, 5px 5px 13px #1d1d1de6, inset 1px 1px 2px #2323234d, inset -1px -1px 2px #1d1d1d80;
+    color: var(--app-font-color);
+    font-size: 2.4rem;
+    font-weight: 500;
+    height: 4rem;
+    margin: 0 auto;
+    margin-bottom: 15px;
+    padding: 0 2rem;
+    text-transform: uppercase;
+    width: 15%;
+}
+
+@media only screen and (max-device-width: 440px) {
+    * {
+        font-size: 64px;
+    }
+
+    #container-page {
+        margin: 2rem auto;
+        justify-content: center;
+        flex-direction: column;
+        margin: 3.5rem auto;
+    }
+
+    .Page-Title-Bar {
+        align-items: center;
+        justify-content: center;
+    }
+
+    .task-list-blocks {
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .Task-list-container, .Task-container {
+        width: 90%;
+        margin-bottom: 2rem;
+    }
+
+    .ButtonBack {
+        width: 40%;
+        font-size: 3rem;
+    }
+
+    .task-completed {
+        text-decoration: line-through;
+        color: gray;
+    }
+    
+}
