@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Custom Login Page</title>
+    <title>Custom Login</title>
+    <link rel="stylesheet" th:href="@{/css/styleLogin.css}" />
 </head>
 <body>
-<h1>Moja strona logowania</h1>
+<h2>Mój Custom Login</h2>
 
-<!-- Ponieważ w tym momencie NIE ustalamy loginProcessingUrl,
-     Spring Security domyślnie nasłuchuje na POST /login -->
+<!--
+  Ponieważ .formLogin() domyślnie używa POST /login do przetworzenia logowania,
+  pola muszą mieć name="username" i name="password" (jeśli nie konfigurowałeś inaczej).
+-->
 <form th:action="@{/login}" method="post">
-    <input type="text" name="username" placeholder="Nazwa użytkownika"/>
-    <input type="password" name="password" placeholder="Hasło"/>
+    <input type="text" name="username" placeholder="login">
+    <input type="password" name="password" placeholder="hasło">
     <button type="submit">Zaloguj</button>
 </form>
 

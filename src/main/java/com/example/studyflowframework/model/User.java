@@ -1,4 +1,4 @@
-package com.example.studyflowframework.model;
+/*package com.example.studyflowframework.model;
 
 import jakarta.persistence.*;
 
@@ -62,3 +62,4 @@ public class User {
         this.role = role;
     }
 }
+*/

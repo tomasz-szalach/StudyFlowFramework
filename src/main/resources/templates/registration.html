@@ -1,56 +1,56 @@
-<!DOCTYPE html>
-<html lang="en">
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="utf-8">
-    <meta name="description" content="Zarejestruj się na StudyFlow">
-    <meta name="keywords" content="rejestracja, konto, StudyFlow">
-    <title>StudyFlow - Rejestracja</title>
-    <link rel="stylesheet" type="text/css" th:href="@{/css/styleRegistration.css}">
-    <script type="text/javascript" th:src="@{/js/togglePassword.js}" defer></script>
-</head>
-<body>
-<div id="Page_topbar">
-    <img class="Logo-small" th:src="@{/img/logo.svg}">
-</div>
-<div id="container">
-    <div id="root">
-        <div class="PageContainer">
-            <section class="Registration-section">
-                <section class="ContainerBox">
-                    <h1 class="SignUp-Title">Zarejestruj się</h1>
-                    <form class="SignUp-form" th:action="@{/registrationUser}" method="POST">
-                        <div class="messages" th:if="${messages}">
-                            <p th:each="message : ${messages}" th:text="${message}"></p>
-                        </div>
-                        <div class="Input-container">
-                            <input class="Input_input" type="text" name="username" placeholder="Nazwa użytkownika" required>
-                        </div>
-                        <div class="Input-container">
-                            <input class="Input_input" type="text" name="email" placeholder="E-mail" required>
-                        </div>
-                        <div class="Input-container">
-                            <input class="Input_input Input_input_password" type="password" name="password" placeholder="Hasło" required>
-                        </div>
-                        <div class="Input-container">
-                            <input class="Input_input Input_input_password" type="password" name="password2" placeholder="Powtórz hasło" required>
-                        </div>
-                        <label class="SignUp-checkBox">
-                            <input type="checkbox" onchange="togglePassword(this)">
-                            <em>Pokaż hasło</em>
-                        </label>
-                        <div class="SignUp-formOptions">
-                            <button class="ButtonSignUp" type="submit">Zarejestruj się</button>
-                            <div class="SignUp-optionlink">
-                                <a th:href="@{/login}">Zaloguj się</a>
-                            </div>
-                        </div>
-                    </form>
-                </section>
-                <img class="Login-logo" th:src="@{/img/logo.svg}">
-            </section>
-        </div>
-    </div>
-</div>
-</body>
-</html>
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--    <meta charset="utf-8">-->
+<!--    <meta name="description" content="Zarejestruj się na StudyFlow">-->
+<!--    <meta name="keywords" content="rejestracja, konto, StudyFlow">-->
+<!--    <title>StudyFlow - Rejestracja</title>-->
+<!--    <link rel="stylesheet" type="text/css" th:href="@{/css/styleRegistration.css}">-->
+<!--    <script type="text/javascript" th:src="@{/js/togglePassword.js}" defer></script>-->
+<!--</head>-->
+<!--<body>-->
+<!--<div id="Page_topbar">-->
+<!--    <img class="Logo-small" th:src="@{/img/logo.svg}">-->
+<!--</div>-->
+<!--<div id="container">-->
+<!--    <div id="root">-->
+<!--        <div class="PageContainer">-->
+<!--            <section class="Registration-section">-->
+<!--                <section class="ContainerBox">-->
+<!--                    <h1 class="SignUp-Title">Zarejestruj się</h1>-->
+<!--                    <form class="SignUp-form" th:action="@{/registrationUser}" method="POST">-->
+<!--                        <div class="messages" th:if="${messages}">-->
+<!--                            <p th:each="message : ${messages}" th:text="${message}"></p>-->
+<!--                        </div>-->
+<!--                        <div class="Input-container">-->
+<!--                            <input class="Input_input" type="text" name="username" placeholder="Nazwa użytkownika" required>-->
+<!--                        </div>-->
+<!--                        <div class="Input-container">-->
+<!--                            <input class="Input_input" type="text" name="email" placeholder="E-mail" required>-->
+<!--                        </div>-->
+<!--                        <div class="Input-container">-->
+<!--                            <input class="Input_input Input_input_password" type="password" name="password" placeholder="Hasło" required>-->
+<!--                        </div>-->
+<!--                        <div class="Input-container">-->
+<!--                            <input class="Input_input Input_input_password" type="password" name="password2" placeholder="Powtórz hasło" required>-->
+<!--                        </div>-->
+<!--                        <label class="SignUp-checkBox">-->
+<!--                            <input type="checkbox" onchange="togglePassword(this)">-->
+<!--                            <em>Pokaż hasło</em>-->
+<!--                        </label>-->
+<!--                        <div class="SignUp-formOptions">-->
+<!--                            <button class="ButtonSignUp" type="submit">Zarejestruj się</button>-->
+<!--                            <div class="SignUp-optionlink">-->
+<!--                                <a th:href="@{/login}">Zaloguj się</a>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </form>-->
+<!--                </section>-->
+<!--                <img class="Login-logo" th:src="@{/img/logo.svg}">-->
+<!--            </section>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+<!--</body>-->
+<!--</html>-->

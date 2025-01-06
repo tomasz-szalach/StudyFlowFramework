@@ -1,4 +1,4 @@
-package com.example.studyflowframework.model;
+/*package com.example.studyflowframework.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
@@ -28,3 +28,4 @@ public class Task {
     // Getters and Setters
     // ...
 }
+*/

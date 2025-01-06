@@ -1,4 +1,4 @@
-/*package com.example.studyflowframework.controller;
+package com.example.studyflowframework.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class LoginController {
 
     @GetMapping("/login")
-    public String showLoginPage() {
-        // teraz zwracamy "custom-login", a nie "login"
-        return "custom-login";
+    public String showLogin() {
+        // Nazwa widoku: szuka pliku "login.html" w folderze resources/templates/
+        return "login";
     }
-}*/
+}

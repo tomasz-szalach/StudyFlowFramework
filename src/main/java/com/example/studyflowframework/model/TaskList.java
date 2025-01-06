@@ -1,6 +1,6 @@
 package com.example.studyflowframework.model;
 
-import jakarta.persistence.*;
+/*import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
@@ -19,3 +19,4 @@ public class TaskList {
     // Getters and Setters
     // ...
 }
+*/

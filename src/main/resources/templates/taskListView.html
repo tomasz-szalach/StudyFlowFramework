@@ -1,47 +1,47 @@
-<!DOCTYPE html>
-<html lang="en">
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="utf-8">
-    <meta name="description" content="Task Management">
-    <meta name="keywords" content="tasks">
-    <title>Task Manager - Home</title>
-    <link rel="stylesheet" type="text/css" th:href="@{/css/styletaskList.css}">
-    <script type="text/javascript" th:src="@{/js/taskActions.js}" defer></script>
-</head>
-<body>
-<div id="TopBar">
-    <div id="User-profile">
-        <div class="User-profile2">
-            <img class="User-profile-avatar" th:src="@{/img/defaultAvatar.svg}">
-            <a th:href="@{/logout}" class="Logout">Logout</a>
-        </div>
-    </div>
-</div>
-<div class="Page-Title-Bar">
-    <span>Task Manager</span>
-</div>
-<div id="container-page">
-    <div class="task-list-blocks">
-        <ul id="task-lists">
-            <li th:each="taskList : ${taskLists}"
-                th:onclick="'showTasks(' + ${taskList.id} + ')'">
-                <span th:text="${taskList.name}"></span>
-            </li>
-        </ul>
-        <button th:onclick="addTaskList()">Add Task List</button>
-    </div>
-    <div class="task-blocks">
-        <ul id="tasks">
-            <!-- Tasks will be dynamically added via JavaScript -->
-        </ul>
-        <button th:onclick="addTask()">Add Task</button>
-    </div>
-</div>
-<footer>
-    <a class="ButtonBack" th:href="@{/homePage}">
-        Back
-    </a>
-</footer>
-</body>
-</html>
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--    <meta charset="utf-8">-->
+<!--    <meta name="description" content="Task Management">-->
+<!--    <meta name="keywords" content="tasks">-->
+<!--    <title>Task Manager - Home</title>-->
+<!--    <link rel="stylesheet" type="text/css" th:href="@{/css/styletaskList.css}">-->
+<!--    <script type="text/javascript" th:src="@{/js/taskActions.js}" defer></script>-->
+<!--</head>-->
+<!--<body>-->
+<!--<div id="TopBar">-->
+<!--    <div id="User-profile">-->
+<!--        <div class="User-profile2">-->
+<!--            <img class="User-profile-avatar" th:src="@{/img/defaultAvatar.svg}">-->
+<!--            <a th:href="@{/logout}" class="Logout">Logout</a>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+<!--<div class="Page-Title-Bar">-->
+<!--    <span>Task Manager</span>-->
+<!--</div>-->
+<!--<div id="container-page">-->
+<!--    <div class="task-list-blocks">-->
+<!--        <ul id="task-lists">-->
+<!--            <li th:each="taskList : ${taskLists}"-->
+<!--                th:onclick="'showTasks(' + ${taskList.id} + ')'">-->
+<!--                <span th:text="${taskList.name}"></span>-->
+<!--            </li>-->
+<!--        </ul>-->
+<!--        <button th:onclick="addTaskList()">Add Task List</button>-->
+<!--    </div>-->
+<!--    <div class="task-blocks">-->
+<!--        <ul id="tasks">-->
+<!--            &lt;!&ndash; Tasks will be dynamically added via JavaScript &ndash;&gt;-->
+<!--        </ul>-->
+<!--        <button th:onclick="addTask()">Add Task</button>-->
+<!--    </div>-->
+<!--</div>-->
+<!--<footer>-->
+<!--    <a class="ButtonBack" th:href="@{/homePage}">-->
+<!--        Back-->
+<!--    </a>-->
+<!--</footer>-->
+<!--</body>-->
+<!--</html>-->
