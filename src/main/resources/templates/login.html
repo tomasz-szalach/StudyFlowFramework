@@ -1,21 +1,72 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Custom Login</title>
+    <meta charset="utf-8">
+    <meta name="description" content="Find the band you want">
+    <meta name="keywords" content="band">
+    <title>StudyFlow</title>
     <link rel="stylesheet" th:href="@{/css/styleLogin.css}" />
+    <script th:src="@{/js/togglePassword.js}" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-<h2>Mój Custom Login</h2>
+<div id="Page_topbar">
+    <img class="Logo-small" th:src="@{/img/logo.svg}" alt="StudyFlow Logo">
+</div>
+<div id="container">
+    <div id="root">
+        <div class="PageContainer">
+            <section class="Login-section">
+                <section class="ContainerBox">
+                    <h1 class="Login-Title">Login</h1>
 
-<!--
-  Ponieważ .formLogin() domyślnie używa POST /login do przetworzenia logowania,
-  pola muszą mieć name="username" i name="password" (jeśli nie konfigurowałeś inaczej).
--->
-<form th:action="@{/login}" method="post">
-    <input type="text" name="username" placeholder="login">
-    <input type="password" name="password" placeholder="hasło">
-    <button type="submit">Zaloguj</button>
-</form>
+                    <!--
+                      Spring Security domyślnie oczekuje pól:
+                        name="username" i name="password"
+                      Przy POST /login. Jeśli chcesz użyć name="email",
+                      trzeba skonfigurować .usernameParameter("email") w SecurityConfig.
+                    -->
+                    <form class="Login-form" th:action="@{/login}" method="post">
 
+                        <!-- Przykładowa sekcja do wyświetlania komunikatów, jeśli je przekażesz w modelu -->
+                        <div class="messages" th:if="${messages}">
+                            <p th:each="message : ${messages}" th:text="${message}"></p>
+                        </div>
+
+                        <div class="Input-container">
+                            <input class="Input_input"
+                                   type="text"
+                                   name="username"
+                                   placeholder="E-mail"
+                                   required />
+                        </div>
+
+                        <div class="Input-container">
+                            <input class="Input_input Input_input_password"
+                                   type="password"
+                                   name="password"
+                                   placeholder="Hasło"
+                                   required />
+                        </div>
+
+                        <label class="Login-checkBox">
+                            <input type="checkbox" onchange="togglePassword(this)">
+                            <em>Pokaż hasło</em>
+                        </label>
+
+                        <div class="Login-formOptions">
+                            <button class="ButtonLogin" type="submit">Zaloguj się</button>
+                            <div class="Login-optionlink">
+                                <a th:href="@{/registrationUser}">Utwórz konto</a>
+                            </div>
+                        </div>
+                    </form>
+                </section>
+
+                <img class="Login-logo" th:src="@{/img/logo.svg}" alt="StudyFlow Logo">
+            </section>
+        </div>
+    </div>
+</div>
 </body>
 </html>

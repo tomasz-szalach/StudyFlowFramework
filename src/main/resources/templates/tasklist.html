@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="Task Management">
+    <meta name="keywords" content="tasks">
+    <title>Task Manager - Home</title>
+
+    <link rel="stylesheet" th:href="@{/css/styletaskList.css}" />
+    <script th:src="@{/js/taskActions.js}" defer></script>
+</head>
+<body>
+<div id="TopBar">
+    <div id="User-profile">
+        <div class="User-profile2" onclick="logout(this)">
+            <img class="User-profile-avatar" th:src="@{/img/defaultAvatar.svg}" alt="Default Avatar">
+            <span class="Logout">Logout</span>
+        </div>
+    </div>
+</div>
+
+<div class="Page-Title-Bar">
+    <span>Task Manager</span>
+</div>
+
+<div id="container-page">
+    <div class="task-list-blocks">
+        <ul id="task-lists">
+            <!-- Zamiast php foreach ($taskLists as $taskList) ... -> thymeleaf th:each -->
+            <li th:each="taskList : ${taskLists}"
+                th:onclick="'showTasks(' + ${taskList.id} + ')'">
+                <!-- Wyświetlamy nazwę listy -->
+                <span th:text="${taskList.name}">TaskList Name</span>
+            </li>
+        </ul>
+        <button onclick="addTaskList()">Add Task List</button>
+    </div>
+
+    <div class="task-blocks">
+        <ul id="tasks"></ul>
+        <button onclick="addTask()">Add Task</button>
+    </div>
+</div>
+
+<footer>
+    <!--
+        W starym kodzie:
+        <a class="ButtonBack" href="homePage">Back</a>
+        Teraz od Ciebie zależy, czy chcesz przekierować np. na /home
+        lub /homepage.
+    -->
+    <a class="ButtonBack" th:href="@{/home}">
+        Back
+    </a>
+</footer>
+</body>
+</html>
