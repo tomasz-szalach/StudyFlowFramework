@@ -67,6 +67,7 @@
             <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
 
+
         <!-- (Opcjonalnie) Testy, jeśli chcesz -->
         <!--
         <dependency>
