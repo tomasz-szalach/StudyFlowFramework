@@ -6,11 +6,13 @@
     <meta name="keywords" content="tasks, todo, list">
     <title>StudyFlow</title>
 
-    <!-- Główne pliki CSS/JS, ewentualnie usuń/zakomentuj stary taskList.js -->
+    <!-- Style i skrypty -->
     <link rel="stylesheet" th:href="@{/css/stylehomePage.css}" />
     <script th:src="@{/js/logout.js}" defer></script>
     <script th:src="@{/js/search.js}" defer></script>
-    <!-- <script th:src="@{/js/taskList.js}" defer></script>  <-- zakomentowane -->
+    <!-- ewentualnie zakomentuj starego taskList.js, jeśli jest
+         <script th:src="@{/js/taskList.js}" defer></script>
+    -->
     <script th:src="@{/js/changePassword.js}" defer></script>
 </head>
 <body>
@@ -30,7 +32,7 @@
     <aside class="sidebar">
         <div class="tasklist-display">
             <h3>Twoje listy zadań</h3>
-            <!-- Lista zadań w pętli - ale TYLKO listy, BEZ zadań. -->
+            <!-- Listy zadań generowane przez Thymeleaf, wczytane w HomeController -->
             <div th:if="${taskLists != null}">
                 <div th:each="taskList, iter : ${taskLists}">
                     <div class="home-blocks">
@@ -46,14 +48,17 @@
                     </div>
                 </div>
             </div>
-            <a class="add-tasklist" th:href="@{/addTaskList}">Dodaj nową listę zadań</a>
+
+            <!-- PRZYWRÓCENIE linku do /addTaskList -->
+            <a class="add-tasklist" th:href="@{/addTaskList}">
+                Dodaj nową listę zadań
+            </a>
         </div>
     </aside>
 
     <main class="main-content">
         <div class="Page-Title-Bar">
             <span class="page-title">
-                <!-- Pętla z zadaniami usunięta - tytuł listy można zostawić: -->
                 Zadania <span th:text="${activeListName}">Domyślna lista</span>
             </span>
         </div>
@@ -63,16 +68,19 @@
             <span class="search-icon">&#128269;</span>
         </div>
 
-        <a class="create-task-button" th:href="@{/addTaskPage}">Utwórz nowe zadanie</a>
+        <!-- PRZYWRÓCENIE linku do /addTaskPage -->
+        <a class="create-task-button" th:href="@{/addTaskPage}">
+            Utwórz nowe zadanie
+        </a>
 
-        <!-- Usuwamy pętlę Thymeleaf po zadaniach. Zostaje puste: -->
+        <!-- Zadania (dynamicznie wypełniane przez JS + /api/...) -->
         <section class="task-display">
-            <!-- Zadania będą wypełniane dynamicznie przez fetch -->
+            <!-- Nic nie ma na starcie, JS wypełni w kliku listy -->
         </section>
     </main>
 </div>
 
-<!-- Szablon do klonowania, jeśli chcesz (opcjonalnie). -->
+<!-- Szablon do klonowania w JS (opcjonalnie). -->
 <template id="task-template">
     <div class="task-item" data-task-id="">
         <div class="task-header">
@@ -98,11 +106,11 @@
         const searchInput = document.getElementById('search');
         const taskDisplay = document.querySelector('.task-display');
 
-        // 1) KLIK w listę w sidebarze
+        // 1) Klik w listę => pobieranie zadań danej listy
         taskListLinks.forEach(link => {
             link.addEventListener('click', async (ev) => {
                 ev.preventDefault();
-                // Zmiana wyglądu
+                // UI: .selected
                 taskListLinks.forEach(l => l.classList.remove('selected'));
                 link.classList.add('selected');
 
@@ -111,8 +119,7 @@
                 pageTitle.textContent = 'Zadania ' + listName;
                 const listId = link.dataset.tasklistId;
 
-                // fetch -> /api/tasks/tasklists/{listId}/tasks
-                // (tu zakładamy, że w TaskRepository jest ORDER BY dueDate asc)
+                // GET /api/tasks/tasklists/{listId}/tasks
                 try {
                     const response = await fetch(`/api/tasks/tasklists/${listId}/tasks`);
                     if (!response.ok) {
@@ -121,10 +128,10 @@
                     }
                     const tasks = await response.json();
 
-                    // WYCZYŚĆ .task-display
+                    // Czyścimy
                     taskDisplay.innerHTML = '';
 
-                    // Rendery zadań
+                    // Render zadań
                     renderTasks(tasks);
                 } catch(e) {
                     console.error('Błąd fetch:', e);
@@ -132,10 +139,9 @@
             });
         });
 
-        // 2) Wpisywanie w polu #search => wyszukiwanie
+        // 2) Wyszukiwanie w polu #search
         searchInput.addEventListener('input', async function() {
             const query = searchInput.value;
-            // szukamy .TASKLIST.selected
             const selectedLink = document.querySelector('.TASKLIST.selected');
             if (!selectedLink) return; // brak wybranej listy
             const listId = selectedLink.dataset.tasklistId;
@@ -155,10 +161,9 @@
             }
         });
 
-        // 3) Po starcie symulujemy klik w pierwszą listę (jeśli istnieje)
+        // 3) Po starcie symulujemy klik w pierwszą listę
         const defaultList = document.querySelector('.TASKLIST.selected');
         if (defaultList) {
-            // Wywołujemy click() programowo
             defaultList.click();
         }
 
@@ -219,13 +224,13 @@
 
                 taskDisplay.appendChild(itemDiv);
 
-                // eventy
+                // eventy: toggle, delete
                 checkbox.addEventListener('change', () => toggleTaskStatus(itemDiv));
                 deleteBtn.addEventListener('click', () => deleteTaskItem(itemDiv));
             }
         }
 
-        // 5) Toggle status
+        // 5) Toggle status => PATCH /api/tasks/{id}/toggle
         async function toggleTaskStatus(taskItem) {
             const taskId = taskItem.dataset.taskId;
             const checkbox = taskItem.querySelector('.task-checkbox');
@@ -253,7 +258,7 @@
             }
         }
 
-        // 6) Delete task
+        // 6) Delete task => DELETE /api/tasks/{id}
         async function deleteTaskItem(taskItem) {
             if (!confirm('Na pewno usunąć zadanie?')) return;
             const taskId = taskItem.dataset.taskId;

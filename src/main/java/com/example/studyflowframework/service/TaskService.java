@@ -61,6 +61,11 @@ public class TaskService {
     }
 
     @Transactional
+    public Task saveTask(Task task) {
+        return taskRepository.save(task);
+    }
+
+    @Transactional
     public void deleteTask(Long taskId) {
         taskRepository.deleteById(taskId);
     }
