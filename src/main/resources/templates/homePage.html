@@ -6,16 +6,17 @@
     <meta name="keywords" content="tasks, todo, list">
     <title>StudyFlow</title>
 
-    <!-- Twoje style i skrypty -->
+    <!-- CSS i skrypty stare, jeśli nie przeszkadzają -->
     <link rel="stylesheet" th:href="@{/css/stylehomePage.css}" />
     <script th:src="@{/js/logout.js}" defer></script>
     <script th:src="@{/js/search.js}" defer></script>
-    <script th:src="@{/js/taskList.js}" defer></script>
+    <!-- WAŻNE: stary taskList.js lepiej ZAKOMENTUJ lub usuń,
+         bo on wywołuje /getTasks?id=..., co nie istnieje. -->
+    <!-- <script th:src="@{/js/taskList.js}" defer></script> -->
     <script th:src="@{/js/changePassword.js}" defer></script>
 </head>
 <body>
 <div id="TopBar">
-    <!-- Logo -->
     <img class="logo" th:src="@{/img/logo.svg}" alt="Logo">
     <div id="User-profile">
         <div class="User-profile2" onclick="logout(this)">
@@ -31,8 +32,6 @@
     <aside class="sidebar">
         <div class="tasklist-display">
             <h3>Twoje listy zadań</h3>
-
-            <!-- Blok z listami zadań (taskLists) -->
             <div th:if="${taskLists != null}">
                 <div th:each="taskList, iter : ${taskLists}">
                     <div class="home-blocks">
@@ -48,8 +47,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Link do dodawania nowej listy zadań -->
             <a class="add-tasklist" th:href="@{/addTaskList}">Dodaj nową listę zadań</a>
         </div>
     </aside>
@@ -60,17 +57,15 @@
                 Zadania <span th:text="${activeListName}">Domyślna lista</span>
             </span>
         </div>
-
         <div class="search-bar">
             <input id="search" placeholder="Znajdź zadanie" />
             <span class="search-icon">&#128269;</span>
         </div>
-
         <a class="create-task-button" th:href="@{/addTaskPage}">Utwórz nowe zadanie</a>
 
         <section class="task-display">
+            <!-- Zadania wstępnie wyrenderowane przez Thymeleaf -->
             <div th:if="${tasks != null}">
-                <!-- Zadania -->
                 <div th:each="task : ${tasks}"
                      class="task-item"
                      th:attr="data-task-id=${task.id}">
@@ -78,19 +73,15 @@
                         <input type="checkbox"
                                class="task-checkbox"
                                th:checked="${task.status} == 'completed' ? true : false" />
-
                         <div class="name"
                              th:classappend="${task.status} == 'completed' ? ' completed' : ''"
-                             th:text="${task.name}">Nazwa zadania</div>
-
+                             th:text="${task.name}">Zadanie</div>
                         <div class="due-date" th:text="${task.dueDate}">Data</div>
-
                         <div class="status"
-                             th:text="${task.status} == 'completed' ? 'Zakończone' : 'Do zrobienia'">Do zrobienia</div>
-
+                             th:text="${task.status} == 'completed' ? 'Zakończone' : 'Do zrobienia'"></div>
                         <button class="delete-task-button">🗑️</button>
                     </div>
-                    <div class="description" th:text="${task.description}">Opis zadania</div>
+                    <div class="description" th:text="${task.description}">Opis</div>
                 </div>
             </div>
         </section>
@@ -114,85 +105,149 @@
     <p>&copy; 2024 StudyFlow</p>
 </footer>
 
-<!-- Skrypt do obsługi checkbox (toggle) i kosza (usuwanie) przez REST -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
 
-        // 1) Stare klikanie, zmiana tytułu
-        const taskLists = document.querySelectorAll('.TASKLIST');
         const pageTitle = document.querySelector('.page-title');
-        taskLists.forEach(taskList => {
-            taskList.addEventListener('click', function () {
-                taskLists.forEach(tl => tl.classList.remove('selected'));
-                this.classList.add('selected');
-                const taskListName = this.querySelector('.name').textContent;
-                pageTitle.textContent = 'Zadania ' + taskListName;
-            });
-        });
+        const taskListLinks = document.querySelectorAll('.TASKLIST');
 
-        // 2) Checkbox -> PATCH /api/tasks/<id>/toggle
-        const checkboxes = document.querySelectorAll('.task-checkbox');
-        checkboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', async (ev) => {
-                const taskItem = ev.target.closest('.task-item');
-                const taskId = taskItem.dataset.taskId;
+        // 1) KLIK W LISTĘ W SIDEBARZE
+        taskListLinks.forEach(link => {
+            link.addEventListener('click', async (ev) => {
+                ev.preventDefault();
+                // Styl .selected
+                taskListLinks.forEach(l => l.classList.remove('selected'));
+                link.classList.add('selected');
 
+                // Nazwa + ID
+                const listName = link.querySelector('.name').textContent;
+                pageTitle.textContent = 'Zadania ' + listName;
+                const listId = link.dataset.tasklistId;
+
+                // fetch -> /api/tasks/tasklists/{listId}/tasks
                 try {
-                    const response = await fetch(`/api/tasks/${taskId}/toggle`, {
-                        method: 'PATCH'
-                    });
+                    const response = await fetch(`/api/tasks/tasklists/${listId}/tasks`);
                     if (!response.ok) {
-                        console.error('Błąd toggle:', response.status);
-                        // cofamy checkbox
-                        ev.target.checked = !ev.target.checked;
+                        console.error('Błąd pobierania zadań listy:', response.status);
                         return;
                     }
-                    const newStatus = await response.text(); // "completed" / "todo"
+                    const tasks = await response.json();
 
-                    // aktualizujemy w DOM
-                    const nameDiv = taskItem.querySelector('.name');
-                    const statusDiv = taskItem.querySelector('.status');
-                    if (newStatus === 'completed') {
-                        nameDiv.classList.add('completed');
-                        statusDiv.textContent = 'Zakończone';
-                    } else {
-                        nameDiv.classList.remove('completed');
-                        statusDiv.textContent = 'Do zrobienia';
+                    // WYCZYŚĆ OBECNE ZADANIA
+                    const taskDisplay = document.querySelector('.task-display');
+                    taskDisplay.innerHTML = '';
+
+                    // UTWÓRZ NOWE <div> dla każdego zadania w JSON
+                    for (const t of tasks) {
+                        const itemDiv = document.createElement('div');
+                        itemDiv.classList.add('task-item');
+                        itemDiv.dataset.taskId = t.id;
+
+                        const headerDiv = document.createElement('div');
+                        headerDiv.classList.add('task-header');
+
+                        // checkbox
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.classList.add('task-checkbox');
+                        if (t.status === 'completed') {
+                            checkbox.checked = true;
+                        }
+
+                        // name
+                        const nameDiv = document.createElement('div');
+                        nameDiv.classList.add('name');
+                        nameDiv.textContent = t.name;
+                        if (t.status === 'completed') {
+                            nameDiv.classList.add('completed');
+                        }
+
+                        // due date
+                        const dueDateDiv = document.createElement('div');
+                        dueDateDiv.classList.add('due-date');
+                        dueDateDiv.textContent = t.dueDate || '';
+
+                        // status
+                        const statusDiv = document.createElement('div');
+                        statusDiv.classList.add('status');
+                        statusDiv.textContent = (t.status === 'completed') ? 'Zakończone' : 'Do zrobienia';
+
+                        // kosz
+                        const deleteBtn = document.createElement('button');
+                        deleteBtn.classList.add('delete-task-button');
+                        deleteBtn.textContent = '🗑️';
+
+                        // składamy header
+                        headerDiv.appendChild(checkbox);
+                        headerDiv.appendChild(nameDiv);
+                        headerDiv.appendChild(dueDateDiv);
+                        headerDiv.appendChild(statusDiv);
+                        headerDiv.appendChild(deleteBtn);
+
+                        // opis
+                        const descDiv = document.createElement('div');
+                        descDiv.classList.add('description');
+                        descDiv.textContent = t.description || '';
+
+                        itemDiv.appendChild(headerDiv);
+                        itemDiv.appendChild(descDiv);
+
+                        // wstaw do .task-display
+                        taskDisplay.appendChild(itemDiv);
+
+                        // eventy:
+                        checkbox.addEventListener('change', () => toggleTaskStatus(itemDiv));
+                        deleteBtn.addEventListener('click', () => deleteTaskItem(itemDiv));
                     }
-                } catch (e) {
-                    console.error('Error toggleStatus:', e);
-                    ev.target.checked = !ev.target.checked;
+                } catch(e) {
+                    console.error('Błąd fetch:', e);
                 }
             });
         });
 
-        // 3) Usuwanie zadania -> DELETE /api/tasks/<id>
-        const deleteButtons = document.querySelectorAll('.delete-task-button');
-        deleteButtons.forEach(btn => {
-            btn.addEventListener('click', async (ev) => {
-                const taskItem = ev.target.closest('.task-item');
-                const taskId = taskItem.dataset.taskId;
-
-                if (!confirm('Na pewno usunąć zadanie?')) {
+        // 2) FUNKCJA: toggle status
+        async function toggleTaskStatus(taskItem) {
+            const taskId = taskItem.dataset.taskId;
+            const checkbox = taskItem.querySelector('.task-checkbox');
+            try {
+                const resp = await fetch(`/api/tasks/${taskId}/toggle`, { method: 'PATCH' });
+                if (!resp.ok) {
+                    console.error('toggle error', resp.status);
+                    checkbox.checked = !checkbox.checked;
                     return;
                 }
-                try {
-                    const response = await fetch(`/api/tasks/${taskId}`, {
-                        method: 'DELETE'
-                    });
-                    if (!response.ok) {
-                        console.error('Błąd usuwania:', response.status);
-                        return;
-                    }
-                    // usuń element z DOM
-                    taskItem.remove();
-                } catch(e) {
-                    console.error('Error deleteTask:', e);
+                const newStatus = await resp.text();
+                const nameDiv = taskItem.querySelector('.name');
+                const statusDiv = taskItem.querySelector('.status');
+                if (newStatus === 'completed') {
+                    nameDiv.classList.add('completed');
+                    statusDiv.textContent = 'Zakończone';
+                } else {
+                    nameDiv.classList.remove('completed');
+                    statusDiv.textContent = 'Do zrobienia';
                 }
-            });
-        });
+            } catch(e) {
+                console.error('toggle exception', e);
+                checkbox.checked = !checkbox.checked;
+            }
+        }
+
+        // 3) FUNKCJA: usunięcie zadania
+        async function deleteTaskItem(taskItem) {
+            if (!confirm('Na pewno usunąć zadanie?')) return;
+            const taskId = taskItem.dataset.taskId;
+            try {
+                const resp = await fetch(`/api/tasks/${taskId}`, { method: 'DELETE' });
+                if (!resp.ok) {
+                    console.error('delete error', resp.status);
+                    return;
+                }
+                taskItem.remove();
+            } catch(e) {
+                console.error('delete exception', e);
+            }
+        }
     });
 </script>
-
 </body>
 </html>
