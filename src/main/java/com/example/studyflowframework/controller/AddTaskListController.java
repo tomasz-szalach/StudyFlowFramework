@@ -1,7 +1,11 @@
 package com.example.studyflowframework.controller;
 
+import com.example.studyflowframework.model.User;
 import com.example.studyflowframework.service.TaskListService;
+import com.example.studyflowframework.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -16,10 +20,13 @@ import java.util.List;
 public class AddTaskListController {
 
     private final TaskListService taskListService;
+    private final UserRepository userRepository;
 
     @Autowired
-    public AddTaskListController(TaskListService taskListService) {
+    public AddTaskListController(TaskListService taskListService,
+                                 UserRepository userRepository) {
         this.taskListService = taskListService;
+        this.userRepository = userRepository;
     }
 
     // GET -> pokaż formularz
@@ -31,16 +38,20 @@ public class AddTaskListController {
     // POST -> obsługa tworzenia
     @PostMapping("/createTaskList")
     public String createTaskList(@RequestParam String name, Model model) {
-        Long userId = 1L; // TODO: realnie -> z Security
+        // 1. Pobierz email z kontekstu
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        // 2. Znajdź usera, by mieć userId
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
+        Long userId = user.getId();
 
+        // (ew. messages)
         List<String> messages = new ArrayList<>();
 
-        // Tutaj można sprawdzić, czy lista o takiej nazwie już istnieje:
-        // if ( ... ) { messages.add("Taka lista już jest!"); ... }
-
+        // 3. Tworzymy listę zadań
         taskListService.addTaskList(name, userId);
 
-        // Po dodaniu listy -> redirect np. do /home
+        // 4. Redirect do /home
         return "redirect:/home";
     }
 }

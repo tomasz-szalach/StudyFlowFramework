@@ -1,9 +1,13 @@
 package com.example.studyflowframework.controller;
 
 import com.example.studyflowframework.model.TaskList;
+import com.example.studyflowframework.model.User;
 import com.example.studyflowframework.service.TaskListService;
 import com.example.studyflowframework.service.TaskService;
+import com.example.studyflowframework.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -18,21 +22,31 @@ public class AddTaskController {
 
     private final TaskListService taskListService;
     private final TaskService taskService;
+    private final UserRepository userRepository;
 
     @Autowired
-    public AddTaskController(TaskListService taskListService, TaskService taskService) {
+    public AddTaskController(TaskListService taskListService,
+                             TaskService taskService,
+                             UserRepository userRepository) {
         this.taskListService = taskListService;
         this.taskService = taskService;
+        this.userRepository = userRepository;
     }
 
     // GET -> pokaż formularz do dodawania zadania
     @GetMapping("/addTaskPage")
     public String showAddTaskPage(Model model) {
-        Long userId = 1L; // TODO: realnie -> pobierz ID z kontekstu Security
-        // Pobierz listy zadań użytkownika, by wypełnić <select>
+        // 1. Email
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        // 2. userId
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
+        Long userId = user.getId();
+
+        // 3. listy zadań -> wyświetlane w <select> w addTaskPage
         List<TaskList> userLists = taskListService.getAllTaskLists(userId);
         model.addAttribute("taskLists", userLists);
-        return "addTaskPage"; // resources/templates/addTaskPage.html
+        return "addTaskPage";
     }
 
     // POST -> obsługa formularza
@@ -43,12 +57,20 @@ public class AddTaskController {
             @RequestParam String due_date,
             @RequestParam Long task_list_id
     ) {
-        Long userId = 1L; // TODO: pobierz z Security
+        // 1. Email
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        // 2. userId
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
+        Long userId = user.getId();
 
-        // Zakładamy status domyślny "todo"
-        taskService.addTask(name, description, due_date, "todo", task_list_id, userId);
+        // 3. Zakładamy status domyślny "todo"
+        String status = "todo";
 
-        // Po dodaniu zadania przekierowujemy np. na /home
+        // 4. Zapis
+        taskService.addTask(name, description, due_date, status, task_list_id, userId);
+
+        // 5. redirect
         return "redirect:/home";
     }
 }

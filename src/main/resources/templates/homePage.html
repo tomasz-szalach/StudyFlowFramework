@@ -6,7 +6,7 @@
     <meta name="keywords" content="tasks, todo, list">
     <title>StudyFlow</title>
 
-    <!-- Poprawione ścieżki do statycznych zasobów -->
+    <!-- Twoje style i skrypty -->
     <link rel="stylesheet" th:href="@{/css/stylehomePage.css}" />
     <script th:src="@{/js/logout.js}" defer></script>
     <script th:src="@{/js/search.js}" defer></script>
@@ -21,10 +21,6 @@
         <div class="User-profile2" onclick="logout(this)">
             <span class="Logout">Wyloguj się</span>
         </div>
-        <!--
-             Zamiast <div class="User-profile2" id="changePasswordButton">
-             dajemy <a ...> z href do /changePassword (lub innej ścieżki)
-        -->
         <a class="User-profile2" th:href="@{/changePassword}">
             <span class="ChangePassword">Zmień hasło</span>
         </a>
@@ -38,10 +34,6 @@
 
             <!-- Blok z listami zadań (taskLists) -->
             <div th:if="${taskLists != null}">
-                <!--
-                   Pętla po liście "taskLists".
-                   'iter' pozwala nam skorzystać z 'index', by ustawić np. selected na pierwszym.
-                -->
                 <div th:each="taskList, iter : ${taskLists}">
                     <div class="home-blocks">
                         <a class="TASKLIST"
@@ -64,12 +56,6 @@
 
     <main class="main-content">
         <div class="Page-Title-Bar">
-            <!--
-              Wyświetlamy nazwę pierwszej listy zadań (jeśli istnieje).
-              W Thymeleaf nieco trudniej odwołać się wprost do [0],
-              ale jeśli w kontrolerze przekażesz np. 'activeListName', to możesz użyć: th:text="${activeListName}".
-              Na potrzeby przykładu – zakładamy, że mamy atrybut 'activeListName'.
-            -->
             <span class="page-title">
                 Zadania <span th:text="${activeListName}">Domyślna lista</span>
             </span>
@@ -83,24 +69,24 @@
         <a class="create-task-button" th:href="@{/addTaskPage}">Utwórz nowe zadanie</a>
 
         <section class="task-display">
-            <!-- Lista zadań (tasks) -->
             <div th:if="${tasks != null}">
-                <!-- Pętla po 'tasks' -->
-                <div th:each="task : ${tasks}" class="task-item" th:attr="data-task-id=${task.id}">
+                <!-- Zadania -->
+                <div th:each="task : ${tasks}"
+                     class="task-item"
+                     th:attr="data-task-id=${task.id}">
                     <div class="task-header">
-                        <!-- Check, czy status = completed -->
-                        <input type="checkbox" class="task-checkbox"
+                        <input type="checkbox"
+                               class="task-checkbox"
                                th:checked="${task.status} == 'completed' ? true : false" />
 
-                        <!-- Nazwa zadania. Jeśli status completed, dodaj klasę 'completed'. -->
                         <div class="name"
                              th:classappend="${task.status} == 'completed' ? ' completed' : ''"
                              th:text="${task.name}">Nazwa zadania</div>
 
                         <div class="due-date" th:text="${task.dueDate}">Data</div>
 
-                        <!-- Wyświetlamy po polsku 'Zakończone' lub 'Do zrobienia' -->
-                        <div class="status" th:text="${task.status} == 'completed' ? 'Zakończone' : 'Do zrobienia'"></div>
+                        <div class="status"
+                             th:text="${task.status} == 'completed' ? 'Zakończone' : 'Do zrobienia'">Do zrobienia</div>
 
                         <button class="delete-task-button">🗑️</button>
                     </div>
@@ -128,11 +114,13 @@
     <p>&copy; 2024 StudyFlow</p>
 </footer>
 
+<!-- Skrypt do obsługi checkbox (toggle) i kosza (usuwanie) przez REST -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+
+        // 1) Stare klikanie, zmiana tytułu
         const taskLists = document.querySelectorAll('.TASKLIST');
         const pageTitle = document.querySelector('.page-title');
-
         taskLists.forEach(taskList => {
             taskList.addEventListener('click', function () {
                 taskLists.forEach(tl => tl.classList.remove('selected'));
@@ -141,7 +129,70 @@
                 pageTitle.textContent = 'Zadania ' + taskListName;
             });
         });
+
+        // 2) Checkbox -> PATCH /api/tasks/<id>/toggle
+        const checkboxes = document.querySelectorAll('.task-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', async (ev) => {
+                const taskItem = ev.target.closest('.task-item');
+                const taskId = taskItem.dataset.taskId;
+
+                try {
+                    const response = await fetch(`/api/tasks/${taskId}/toggle`, {
+                        method: 'PATCH'
+                    });
+                    if (!response.ok) {
+                        console.error('Błąd toggle:', response.status);
+                        // cofamy checkbox
+                        ev.target.checked = !ev.target.checked;
+                        return;
+                    }
+                    const newStatus = await response.text(); // "completed" / "todo"
+
+                    // aktualizujemy w DOM
+                    const nameDiv = taskItem.querySelector('.name');
+                    const statusDiv = taskItem.querySelector('.status');
+                    if (newStatus === 'completed') {
+                        nameDiv.classList.add('completed');
+                        statusDiv.textContent = 'Zakończone';
+                    } else {
+                        nameDiv.classList.remove('completed');
+                        statusDiv.textContent = 'Do zrobienia';
+                    }
+                } catch (e) {
+                    console.error('Error toggleStatus:', e);
+                    ev.target.checked = !ev.target.checked;
+                }
+            });
+        });
+
+        // 3) Usuwanie zadania -> DELETE /api/tasks/<id>
+        const deleteButtons = document.querySelectorAll('.delete-task-button');
+        deleteButtons.forEach(btn => {
+            btn.addEventListener('click', async (ev) => {
+                const taskItem = ev.target.closest('.task-item');
+                const taskId = taskItem.dataset.taskId;
+
+                if (!confirm('Na pewno usunąć zadanie?')) {
+                    return;
+                }
+                try {
+                    const response = await fetch(`/api/tasks/${taskId}`, {
+                        method: 'DELETE'
+                    });
+                    if (!response.ok) {
+                        console.error('Błąd usuwania:', response.status);
+                        return;
+                    }
+                    // usuń element z DOM
+                    taskItem.remove();
+                } catch(e) {
+                    console.error('Error deleteTask:', e);
+                }
+            });
+        });
     });
 </script>
+
 </body>
 </html>
