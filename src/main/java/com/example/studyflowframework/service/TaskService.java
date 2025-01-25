@@ -33,13 +33,16 @@ public class TaskService {
         return taskRepository.findByUserId(userId);
     }
 
+    /**
+     * Teraz korzystamy z findByTaskListIdAndUserIdOrderByDueDateAsc
+     * (zamiast starego findByTaskListIdAndUserId).
+     */
     public List<Task> getTasksByTaskList(Long listId, Long userId) {
-        return taskRepository.findByTaskListIdAndUserId(listId, userId);
+        return taskRepository.findByTaskListIdAndUserIdOrderByDueDateAsc(listId, userId);
     }
 
     /**
-     * Nowa metoda do wyszukiwania w obrębie listy 'listId' i userId,
-     * według fragmentu 'query' w name/description.
+     * Wyszukiwanie w obrębie listy z sortowaniem rosnąco po dueDate.
      */
     public List<Task> searchTasksInList(Long listId, Long userId, String query) {
         if (query == null) {

@@ -16,20 +16,23 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 
     /**
      * Pobieranie zadań danego usera (bez listy).
+     * (Jeśli chcesz też posortować globalnie, można dopisać order by).
      */
     List<Task> findByUserId(Long userId);
 
     /**
-     * Pobieranie zadań w obrębie konkretnej listy i użytkownika.
+     * Pobieranie zadań w obrębie konkretnej listy i użytkownika,
+     * POSORTOWANE rosnąco po dueDate.
+     *
+     * W Spring Data można to osiągnąć przez nazewnictwo:
+     * findByTaskListIdAndUserIdOrderByDueDateAsc
      */
-    List<Task> findByTaskListIdAndUserId(Long taskListId, Long userId);
+    List<Task> findByTaskListIdAndUserIdOrderByDueDateAsc(Long taskListId, Long userId);
 
     /**
      * Wyszukiwanie zadań w obrębie danej listy i użytkownika
-     * po fragmencie (query) w name lub description.
-     *
-     * - Gdy :query = '', to zwróci wszystkie (warunek OR :query='')
-     * - Używamy LOWER(...), by zignorować wielkość liter.
+     * po fragmencie (query) w name lub description,
+     * z uwzględnieniem sortowania rosnąco po dueDate.
      */
     @Query("""
         SELECT t
@@ -37,10 +40,11 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
         WHERE t.taskListId = :taskListId
           AND t.userId = :userId
           AND (
-            :query = '' 
+            :query = ''
             OR LOWER(t.name) LIKE LOWER(CONCAT('%', :query, '%'))
             OR LOWER(t.description) LIKE LOWER(CONCAT('%', :query, '%'))
           )
+        ORDER BY t.dueDate ASC
     """)
     List<Task> searchTasks(
             @Param("query") String query,

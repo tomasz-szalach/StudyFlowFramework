@@ -6,12 +6,11 @@
     <meta name="keywords" content="tasks, todo, list">
     <title>StudyFlow</title>
 
-    <!-- CSS i skrypty (możesz pozostawić tak jak miałeś) -->
+    <!-- Główne pliki CSS/JS, ewentualnie usuń/zakomentuj stary taskList.js -->
     <link rel="stylesheet" th:href="@{/css/stylehomePage.css}" />
     <script th:src="@{/js/logout.js}" defer></script>
     <script th:src="@{/js/search.js}" defer></script>
-    <!-- Zakomentuj stary taskList.js, jeśli go masz -->
-    <!-- <script th:src="@{/js/taskList.js}" defer></script> -->
+    <!-- <script th:src="@{/js/taskList.js}" defer></script>  <-- zakomentowane -->
     <script th:src="@{/js/changePassword.js}" defer></script>
 </head>
 <body>
@@ -31,6 +30,7 @@
     <aside class="sidebar">
         <div class="tasklist-display">
             <h3>Twoje listy zadań</h3>
+            <!-- Lista zadań w pętli - ale TYLKO listy, BEZ zadań. -->
             <div th:if="${taskLists != null}">
                 <div th:each="taskList, iter : ${taskLists}">
                     <div class="home-blocks">
@@ -53,40 +53,26 @@
     <main class="main-content">
         <div class="Page-Title-Bar">
             <span class="page-title">
+                <!-- Pętla z zadaniami usunięta - tytuł listy można zostawić: -->
                 Zadania <span th:text="${activeListName}">Domyślna lista</span>
             </span>
         </div>
+
         <div class="search-bar">
             <input id="search" placeholder="Znajdź zadanie" />
             <span class="search-icon">&#128269;</span>
         </div>
+
         <a class="create-task-button" th:href="@{/addTaskPage}">Utwórz nowe zadanie</a>
 
+        <!-- Usuwamy pętlę Thymeleaf po zadaniach. Zostaje puste: -->
         <section class="task-display">
-            <!-- Zadania wstępnie wyrenderowane przez Thymeleaf -->
-            <div th:if="${tasks != null}">
-                <div th:each="task : ${tasks}"
-                     class="task-item"
-                     th:attr="data-task-id=${task.id}">
-                    <div class="task-header">
-                        <input type="checkbox"
-                               class="task-checkbox"
-                               th:checked="${task.status} == 'completed' ? true : false" />
-                        <div class="name"
-                             th:classappend="${task.status} == 'completed' ? ' completed' : ''"
-                             th:text="${task.name}">Zadanie</div>
-                        <div class="due-date" th:text="${task.dueDate}">Data</div>
-                        <div class="status"
-                             th:text="${task.status} == 'completed' ? 'Zakończone' : 'Do zrobienia'"></div>
-                        <button class="delete-task-button">🗑️</button>
-                    </div>
-                    <div class="description" th:text="${task.description}">Opis</div>
-                </div>
-            </div>
+            <!-- Zadania będą wypełniane dynamicznie przez fetch -->
         </section>
     </main>
 </div>
 
+<!-- Szablon do klonowania, jeśli chcesz (opcjonalnie). -->
 <template id="task-template">
     <div class="task-item" data-task-id="">
         <div class="task-header">
@@ -112,11 +98,11 @@
         const searchInput = document.getElementById('search');
         const taskDisplay = document.querySelector('.task-display');
 
-        // 1) KLIK W LISTĘ W SIDEBARZE
+        // 1) KLIK w listę w sidebarze
         taskListLinks.forEach(link => {
             link.addEventListener('click', async (ev) => {
                 ev.preventDefault();
-                // Styl .selected
+                // Zmiana wyglądu
                 taskListLinks.forEach(l => l.classList.remove('selected'));
                 link.classList.add('selected');
 
@@ -126,6 +112,7 @@
                 const listId = link.dataset.tasklistId;
 
                 // fetch -> /api/tasks/tasklists/{listId}/tasks
+                // (tu zakładamy, że w TaskRepository jest ORDER BY dueDate asc)
                 try {
                     const response = await fetch(`/api/tasks/tasklists/${listId}/tasks`);
                     if (!response.ok) {
@@ -134,10 +121,10 @@
                     }
                     const tasks = await response.json();
 
-                    // WYCZYŚĆ OBECNE ZADANIA
+                    // WYCZYŚĆ .task-display
                     taskDisplay.innerHTML = '';
 
-                    // UTWÓRZ NOWE <div> dla każdego zadania w JSON
+                    // Rendery zadań
                     renderTasks(tasks);
                 } catch(e) {
                     console.error('Błąd fetch:', e);
@@ -145,18 +132,15 @@
             });
         });
 
-        // 2) EVENT: input w polu wyszukiwania
+        // 2) Wpisywanie w polu #search => wyszukiwanie
         searchInput.addEventListener('input', async function() {
-            const query = searchInput.value; // co wpisujesz w polu
-            // znajdź aktualnie wybraną listę
+            const query = searchInput.value;
+            // szukamy .TASKLIST.selected
             const selectedLink = document.querySelector('.TASKLIST.selected');
-            if (!selectedLink) {
-                // brak wybranej listy => nic nie robimy
-                return;
-            }
+            if (!selectedLink) return; // brak wybranej listy
             const listId = selectedLink.dataset.tasklistId;
 
-            // fetch -> /api/tasks/tasklists/{listId}/search?query=...
+            // GET /api/tasks/tasklists/{listId}/search?query=...
             try {
                 const response = await fetch(`/api/tasks/tasklists/${listId}/search?query=${encodeURIComponent(query)}`);
                 if (!response.ok) {
@@ -164,8 +148,6 @@
                     return;
                 }
                 const tasks = await response.json();
-
-                // WYCZYŚĆ + render
                 taskDisplay.innerHTML = '';
                 renderTasks(tasks);
             } catch(e) {
@@ -173,7 +155,14 @@
             }
         });
 
-        // 3) FUNKCJA: wyrenderuj zadania w .task-display
+        // 3) Po starcie symulujemy klik w pierwszą listę (jeśli istnieje)
+        const defaultList = document.querySelector('.TASKLIST.selected');
+        if (defaultList) {
+            // Wywołujemy click() programowo
+            defaultList.click();
+        }
+
+        // 4) renderTasks
         function renderTasks(tasks) {
             for (const t of tasks) {
                 const itemDiv = document.createElement('div');
@@ -191,7 +180,7 @@
                     checkbox.checked = true;
                 }
 
-                // name
+                // nazwa
                 const nameDiv = document.createElement('div');
                 nameDiv.classList.add('name');
                 nameDiv.textContent = t.name;
@@ -199,7 +188,7 @@
                     nameDiv.classList.add('completed');
                 }
 
-                // due date
+                // data
                 const dueDateDiv = document.createElement('div');
                 dueDateDiv.classList.add('due-date');
                 dueDateDiv.textContent = t.dueDate || '';
@@ -214,14 +203,13 @@
                 deleteBtn.classList.add('delete-task-button');
                 deleteBtn.textContent = '🗑️';
 
-                // składamy header
+                // składamy
                 headerDiv.appendChild(checkbox);
                 headerDiv.appendChild(nameDiv);
                 headerDiv.appendChild(dueDateDiv);
                 headerDiv.appendChild(statusDiv);
                 headerDiv.appendChild(deleteBtn);
 
-                // opis
                 const descDiv = document.createElement('div');
                 descDiv.classList.add('description');
                 descDiv.textContent = t.description || '';
@@ -229,16 +217,15 @@
                 itemDiv.appendChild(headerDiv);
                 itemDiv.appendChild(descDiv);
 
-                // wstaw do .task-display
                 taskDisplay.appendChild(itemDiv);
 
-                // eventy: toggle, delete
+                // eventy
                 checkbox.addEventListener('change', () => toggleTaskStatus(itemDiv));
                 deleteBtn.addEventListener('click', () => deleteTaskItem(itemDiv));
             }
         }
 
-        // 4) Toggle status
+        // 5) Toggle status
         async function toggleTaskStatus(taskItem) {
             const taskId = taskItem.dataset.taskId;
             const checkbox = taskItem.querySelector('.task-checkbox');
@@ -252,6 +239,7 @@
                 const newStatus = await resp.text();
                 const nameDiv = taskItem.querySelector('.name');
                 const statusDiv = taskItem.querySelector('.status');
+
                 if (newStatus === 'completed') {
                     nameDiv.classList.add('completed');
                     statusDiv.textContent = 'Zakończone';
@@ -265,7 +253,7 @@
             }
         }
 
-        // 5) Delete task
+        // 6) Delete task
         async function deleteTaskItem(taskItem) {
             if (!confirm('Na pewno usunąć zadanie?')) return;
             const taskId = taskItem.dataset.taskId;
