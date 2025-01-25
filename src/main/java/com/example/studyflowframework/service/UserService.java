@@ -8,6 +8,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
+/**
+ * Serwis do obsługi użytkowników (zapisywanie, wyszukiwanie, zmiana hasła).
+ */
 @Service
 public class UserService {
 
@@ -18,7 +21,19 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User getUserByEmail(String email) throws Exception {
+    /**
+     * Znajdź usera po emailu. Jeśli nie istnieje, zwraca null.
+     */
+    public User findByEmail(String email) {
+        Optional<User> opt = userRepository.findByEmail(email);
+        return opt.orElse(null);
+    }
+
+    /**
+     * (Opcjonalna) metoda, która rzuca Exception, jeśli nie ma usera
+     * - jeśli jej potrzebujesz, zostaw. Na razie można skasować lub zostawić.
+     */
+    public User getUserByEmailOrThrow(String email) throws Exception {
         Optional<User> opt = userRepository.findByEmail(email);
         if (opt.isEmpty()) {
             throw new Exception("NoMatchingRecordException: user not found for email " + email);
@@ -31,6 +46,10 @@ public class UserService {
         userRepository.save(user);
     }
 
+    /**
+     * Zmiana hasła w bazie. Nie robimy żadnego encode tutaj,
+     * bo to zależy od użycia encoderów w SecurityConfig (o ile to się robi niżej).
+     */
     @Transactional
     public void updatePassword(Long userId, String newPassword) {
         userRepository.updatePassword(userId, newPassword);
