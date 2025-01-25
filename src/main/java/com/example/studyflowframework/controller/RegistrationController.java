@@ -23,16 +23,22 @@ public class RegistrationController {
         this.userService = userService;
     }
 
-    // GET -> pokaż formularz rejestracji
+    /**
+     * GET -> pokaż formularz rejestracji
+     * Wyświetla widok "registration.html"
+     */
     @GetMapping("/registrationUser")
     public String showRegistrationForm() {
         return "registration"; // resources/templates/registration.html
     }
 
-    // POST -> przetwórz formularz
+    /**
+     * POST -> przetwórz formularz
+     * Parametry: email, password, password2
+     * W encji User mamy konstruktor (String email, String password, String role)
+     */
     @PostMapping("/registrationUser")
     public String processRegistration(
-            @RequestParam String username,
             @RequestParam String email,
             @RequestParam String password,
             @RequestParam String password2,
@@ -40,25 +46,27 @@ public class RegistrationController {
     ) {
         List<String> messages = new ArrayList<>();
 
-        // Przykład walidacji
+        // 1. Walidacja, czy hasła są takie same
         if (!password.equals(password2)) {
             messages.add("Hasła nie są takie same!");
             model.addAttribute("messages", messages);
             return "registration"; // wróć do formularza
         }
 
-        // Sprawdzamy czy email istnieje
+        // 2. Sprawdzamy, czy email już istnieje w bazie
         if (userService.ifContainsEmail(email)) {
             messages.add("Użytkownik o tym emailu już istnieje!");
             model.addAttribute("messages", messages);
             return "registration";
         }
 
-        // Zapisz nowego usera
-        User user = new User(username, email, password, "USER");
+        // 3. Zapisz nowego usera w bazie
+        //    Konstruktor: User(String email, String password, String role)
+        //    Załóżmy, że rejestrujemy domyślnie userów z rolą "USER"
+        User user = new User(email, password, "USER");
         userService.saveUser(user);
 
-        // Po pomyślnej rejestracji można przekierować do /login
+        // 4. Po pomyślnej rejestracji można przekierować do /login
         return "redirect:/login";
     }
 }

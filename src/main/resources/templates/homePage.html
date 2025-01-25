@@ -21,9 +21,13 @@
         <div class="User-profile2" onclick="logout(this)">
             <span class="Logout">Wyloguj się</span>
         </div>
-        <div class="User-profile2" id="changePasswordButton">
+        <!--
+             Zamiast <div class="User-profile2" id="changePasswordButton">
+             dajemy <a ...> z href do /changePassword (lub innej ścieżki)
+        -->
+        <a class="User-profile2" th:href="@{/changePassword}">
             <span class="ChangePassword">Zmień hasło</span>
-        </div>
+        </a>
     </div>
 </div>
 
@@ -66,7 +70,9 @@
               ale jeśli w kontrolerze przekażesz np. 'activeListName', to możesz użyć: th:text="${activeListName}".
               Na potrzeby przykładu – zakładamy, że mamy atrybut 'activeListName'.
             -->
-            <span class="page-title">Zadania <span th:text="${activeListName}">Domyślna lista</span></span>
+            <span class="page-title">
+                Zadania <span th:text="${activeListName}">Domyślna lista</span>
+            </span>
         </div>
 
         <div class="search-bar">

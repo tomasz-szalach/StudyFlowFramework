@@ -6,7 +6,6 @@
     <meta name="keywords" content="rejestracja, konto, StudyFlow">
     <title>StudyFlow - Rejestracja</title>
 
-    <!-- Ścieżki do plików statycznych -->
     <link rel="stylesheet" th:href="@{/css/styleRegistration.css}" />
     <script th:src="@{/js/togglePassword.js}" defer></script>
 </head>
@@ -22,29 +21,24 @@
                 <section class="ContainerBox">
                     <h1 class="SignUp-Title">Zarejestruj się</h1>
 
-                    <!--
-                       Formularz:
-                       W starym kodzie action="registrationUser".
-                       Teraz -> th:action="@{/registrationUser}"
-                    -->
                     <form class="SignUp-form" th:action="@{/registrationUser}" method="POST">
-
-                        <!-- Komunikaty (messages) wyświetlane pętlą, jeśli istnieją w modelu -->
+                        <!-- messages -->
                         <div class="messages" th:if="${messages}">
                             <p th:each="msg : ${messages}" th:text="${msg}"></p>
                         </div>
 
                         <div class="Input-container">
-                            <input class="Input_input" type="text" name="username" placeholder="Nazwa użytkownika" required>
-                        </div>
-                        <div class="Input-container">
                             <input class="Input_input" type="text" name="email" placeholder="E-mail" required>
                         </div>
+
                         <div class="Input-container">
-                            <input class="Input_input Input_input_password" type="password" name="password" placeholder="Hasło" required>
+                            <input class="Input_input Input_input_password"
+                                   type="password" name="password" placeholder="Hasło" required>
                         </div>
+
                         <div class="Input-container">
-                            <input class="Input_input Input_input_password" type="password" name="password2" placeholder="Powtórz hasło" required>
+                            <input class="Input_input Input_input_password"
+                                   type="password" name="password2" placeholder="Powtórz hasło" required>
                         </div>
 
                         <label class="SignUp-checkBox">

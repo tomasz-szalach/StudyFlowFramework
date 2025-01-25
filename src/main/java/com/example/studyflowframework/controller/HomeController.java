@@ -27,21 +27,9 @@ public class HomeController {
     }
 
     @GetMapping("/home")
-    public String showHomePage(Model model) {
-        // Przykładowo pobierz ID zalogowanego usera (na razie "na sztywno")
-        Long userId = 1L; // TODO: docelowo pobierz z Security
-
-        // Wszystkie listy zadań użytkownika
-        List<TaskList> userLists = taskListService.getAllTaskLists(userId);
-
-        // Możesz pobrać zadania dla pierwszej listy lub wszystkie
-        // Tylko przykład:
-        List<Task> tasks = taskService.getTasksByUserId(userId);
-
-        model.addAttribute("taskLists", userLists);
-        model.addAttribute("tasks", tasks);
-        model.addAttribute("activeListName", userLists.isEmpty() ? "Brak list" : userLists.get(0).getName());
-
-        return "homepage"; // -> resources/templates/homepage.html
+    public String showHomePage() {
+        // Tymczasowo NIC nie pobieramy z bazy
+        return "homepage";
     }
+
 }
