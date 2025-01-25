@@ -5,6 +5,9 @@ import com.example.studyflowframework.model.User;
 import com.example.studyflowframework.service.TaskListService;
 import com.example.studyflowframework.service.TaskService;
 import com.example.studyflowframework.repository.UserRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,6 +21,7 @@ import java.util.List;
  * Dodawanie nowego zadania (addTaskPage.html)
  */
 @Controller
+@Tag(name = "Task Management", description = "Operacje związane z zarządzaniem zadaniami")
 public class AddTaskController {
 
     private final TaskListService taskListService;
@@ -33,7 +37,17 @@ public class AddTaskController {
         this.userRepository = userRepository;
     }
 
-    // GET -> pokaż formularz do dodawania zadania
+    /**
+     * Pokaż formularz do dodawania zadania
+     *
+     * @param model Model do przekazania danych do widoku
+     * @return Nazwa widoku
+     */
+    @Operation(summary = "Wyświetla formularz do dodawania nowego zadania")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Formularz wyświetlony pomyślnie"),
+            @ApiResponse(responseCode = "401", description = "Nieautoryzowany dostęp")
+    })
     @GetMapping("/addTaskPage")
     public String showAddTaskPage(Model model) {
         // 1. Email
@@ -49,7 +63,22 @@ public class AddTaskController {
         return "addTaskPage";
     }
 
-    // POST -> obsługa formularza
+    /**
+     * Obsługuje formularz dodawania nowego zadania
+     *
+     * @param name        Nazwa zadania
+     * @param description Opis zadania
+     * @param due_date    Data wykonania zadania
+     * @param task_list_id ID listy zadań
+     * @return Redirect do strony głównej
+     */
+    @Operation(summary = "Dodaje nowe zadanie do określonej listy zadań")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "302", description = "Zadanie dodane, przekierowanie do strony głównej"),
+            @ApiResponse(responseCode = "400", description = "Nieprawidłowe dane wejściowe"),
+            @ApiResponse(responseCode = "401", description = "Nieautoryzowany dostęp"),
+            @ApiResponse(responseCode = "404", description = "Nieznaleziony użytkownik")
+    })
     @PostMapping("/addTask")
     public String addTask(
             @RequestParam String name,

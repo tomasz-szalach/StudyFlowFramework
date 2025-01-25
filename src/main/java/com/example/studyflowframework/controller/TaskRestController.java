@@ -4,6 +4,9 @@ import com.example.studyflowframework.model.Task;
 import com.example.studyflowframework.model.User;
 import com.example.studyflowframework.repository.UserRepository;
 import com.example.studyflowframework.service.TaskService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +23,7 @@ import java.util.List;
  *  - GET  /api/tasks/{id}         -> pojedyncze zadanie
  *  - POST /api/tasks              -> tworzenie nowego
  *  - PUT  /api/tasks/{id}         -> aktualizacja
- *  - DELETE /api/tasks/{id}       -> usunięcie (już było)
+ *  - DELETE /api/tasks/{id}       -> usunięcie
  *
  *  - GET /api/tasks/tasklists/{listId}/tasks
  *  - GET /api/tasks/tasklists/{listId}/search?query=...
@@ -28,6 +31,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/tasks")
+@Tag(name = "Task Management", description = "Operacje związane z zarządzaniem zadaniami")
 public class TaskRestController {
 
     private final TaskService taskService;
@@ -44,9 +48,17 @@ public class TaskRestController {
     //------------------------------------------
 
     /**
-     * GET /api/tasks/{id}
      * Pobiera pojedyncze zadanie (jeśli należy do zalogowanego usera).
+     *
+     * @param id ID zadania.
+     * @return ResponseEntity z zadaniem lub statusem 404.
      */
+    @Operation(summary = "Pobiera pojedyncze zadanie")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Zadanie znalezione"),
+            @ApiResponse(responseCode = "404", description = "Zadanie nie znalezione lub nie należy do użytkownika"),
+            @ApiResponse(responseCode = "401", description = "Nieautoryzowany dostęp")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<Task> getOneTask(@PathVariable Long id) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -60,9 +72,17 @@ public class TaskRestController {
     }
 
     /**
-     * POST /api/tasks
      * Tworzenie nowego zadania.
+     *
+     * @param newTask Obiekt Task z danymi nowego zadania.
+     * @return ResponseEntity z utworzonym zadaniem i statusem 201.
      */
+    @Operation(summary = "Tworzy nowe zadanie")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Zadanie utworzone"),
+            @ApiResponse(responseCode = "400", description = "Nieprawidłowe dane wejściowe"),
+            @ApiResponse(responseCode = "401", description = "Nieautoryzowany dostęp")
+    })
     @PostMapping
     public ResponseEntity<Task> createTask(@RequestBody Task newTask) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -79,9 +99,19 @@ public class TaskRestController {
     }
 
     /**
-     * PUT /api/tasks/{id}
      * Aktualizacja zadania.
+     *
+     * @param id      ID zadania do aktualizacji.
+     * @param updated Obiekt Task z zaktualizowanymi danymi.
+     * @return ResponseEntity z zaktualizowanym zadaniem lub statusem 404.
      */
+    @Operation(summary = "Aktualizuje istniejące zadanie")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Zadanie zaktualizowane"),
+            @ApiResponse(responseCode = "404", description = "Zadanie nie znalezione lub nie należy do użytkownika"),
+            @ApiResponse(responseCode = "400", description = "Nieprawidłowe dane wejściowe"),
+            @ApiResponse(responseCode = "401", description = "Nieautoryzowany dostęp")
+    })
     @PutMapping("/{id}")
     public ResponseEntity<Task> updateTask(@PathVariable Long id,
                                            @RequestBody Task updated) {
@@ -107,9 +137,17 @@ public class TaskRestController {
     }
 
     /**
-     * DELETE /api/tasks/{id}
-     * (Już miałeś taką metodę – dodałem tylko typ).
+     * Usuwa zadanie.
+     *
+     * @param taskId ID zadania do usunięcia.
+     * @return ResponseEntity z statusem 204 lub 404.
      */
+    @Operation(summary = "Usuwa istniejące zadanie")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Zadanie usunięte"),
+            @ApiResponse(responseCode = "404", description = "Zadanie nie znalezione lub nie należy do użytkownika"),
+            @ApiResponse(responseCode = "401", description = "Nieautoryzowany dostęp")
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTask(@PathVariable("id") Long taskId) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -129,10 +167,17 @@ public class TaskRestController {
     //------------------------------------------
 
     /**
-     * GET /api/tasks/tasklists/{listId}/tasks
-     * Zwraca JSON z zadaniami w obrębie listy i usera,
-     * posortowanymi wg dueDate (patrz repository).
+     * Zwraca listę zadań dla określonej listy zadań i użytkownika.
+     *
+     * @param listId ID listy zadań.
+     * @return ResponseEntity z listą zadań.
      */
+    @Operation(summary = "Zwraca listę zadań dla określonej listy zadań i użytkownika")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Zadania zwrócone pomyślnie"),
+            @ApiResponse(responseCode = "404", description = "Lista zadań nie znaleziona lub brak zadań"),
+            @ApiResponse(responseCode = "401", description = "Nieautoryzowany dostęp")
+    })
     @GetMapping("/tasklists/{listId}/tasks")
     public ResponseEntity<List<Task>> getTasksForList(@PathVariable Long listId) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -143,8 +188,18 @@ public class TaskRestController {
     }
 
     /**
-     * GET /api/tasks/tasklists/{listId}/search?query=...
+     * Wyszukuje zadania w określonej liście zadań na podstawie zapytania.
+     *
+     * @param listId ID listy zadań.
+     * @param query  Zapytanie wyszukiwania.
+     * @return ResponseEntity z listą znalezionych zadań.
      */
+    @Operation(summary = "Wyszukuje zadania w określonej liście zadań na podstawie zapytania")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Zadania znalezione pomyślnie"),
+            @ApiResponse(responseCode = "404", description = "Lista zadań nie znaleziona lub brak zadań"),
+            @ApiResponse(responseCode = "401", description = "Nieautoryzowany dostęp")
+    })
     @GetMapping("/tasklists/{listId}/search")
     public ResponseEntity<List<Task>> searchTasksInList(
             @PathVariable Long listId,
@@ -157,9 +212,17 @@ public class TaskRestController {
     }
 
     /**
-     * PATCH /api/tasks/{id}/toggle
-     * Przełącza status zadania z "todo" na "completed" lub odwrotnie
+     * Przełącza status zadania między "todo" a "completed".
+     *
+     * @param taskId ID zadania.
+     * @return ResponseEntity z nowym statusem zadania.
      */
+    @Operation(summary = "Przełącza status zadania między 'todo' a 'completed'")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Status zadania przełączony"),
+            @ApiResponse(responseCode = "404", description = "Zadanie nie znalezione lub nie należy do użytkownika"),
+            @ApiResponse(responseCode = "401", description = "Nieautoryzowany dostęp")
+    })
     @PatchMapping("/{id}/toggle")
     public ResponseEntity<String> toggleStatus(@PathVariable("id") Long taskId) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -180,6 +243,13 @@ public class TaskRestController {
     //------------------------------------------
     // Pomocnicza metoda
     //------------------------------------------
+
+    /**
+     * Znajduje użytkownika na podstawie emaila lub rzuca wyjątkiem.
+     *
+     * @param email Email użytkownika.
+     * @return Obiekt User.
+     */
     private User findUserOrThrow(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));

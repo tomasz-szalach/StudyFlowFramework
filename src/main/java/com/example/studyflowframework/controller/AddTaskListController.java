@@ -3,6 +3,9 @@ package com.example.studyflowframework.controller;
 import com.example.studyflowframework.model.User;
 import com.example.studyflowframework.service.TaskListService;
 import com.example.studyflowframework.repository.UserRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -17,6 +20,7 @@ import java.util.List;
  * Dodawanie nowej listy zadań (addTaskList.html)
  */
 @Controller
+@Tag(name = "Task List Management", description = "Operacje związane z zarządzaniem listami zadań")
 public class AddTaskListController {
 
     private final TaskListService taskListService;
@@ -29,13 +33,35 @@ public class AddTaskListController {
         this.userRepository = userRepository;
     }
 
-    // GET -> pokaż formularz
+    /**
+     * Wyświetla formularz do dodawania nowej listy zadań
+     *
+     * @return Nazwa widoku formularza
+     */
+    @Operation(summary = "Wyświetla formularz do dodawania nowej listy zadań")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Formularz wyświetlony pomyślnie"),
+            @ApiResponse(responseCode = "401", description = "Nieautoryzowany dostęp")
+    })
     @GetMapping("/addTaskList")
     public String showAddTaskListForm() {
         return "addTaskList"; // resources/templates/addTaskList.html
     }
 
-    // POST -> obsługa tworzenia
+    /**
+     * Tworzy nową listę zadań dla zalogowanego użytkownika
+     *
+     * @param name  Nazwa nowej listy zadań
+     * @param model Model do przekazania danych do widoku
+     * @return Redirect do strony głównej
+     */
+    @Operation(summary = "Tworzy nową listę zadań dla zalogowanego użytkownika")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "302", description = "Lista zadań utworzona, przekierowanie do strony głównej"),
+            @ApiResponse(responseCode = "400", description = "Nieprawidłowe dane wejściowe"),
+            @ApiResponse(responseCode = "401", description = "Nieautoryzowany dostęp"),
+            @ApiResponse(responseCode = "404", description = "Nieznaleziony użytkownik")
+    })
     @PostMapping("/createTaskList")
     public String createTaskList(@RequestParam String name, Model model) {
         // 1. Pobierz email z kontekstu

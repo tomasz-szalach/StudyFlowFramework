@@ -2,6 +2,9 @@ package com.example.studyflowframework.controller;
 
 import com.example.studyflowframework.model.User;
 import com.example.studyflowframework.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -16,6 +19,7 @@ import java.util.List;
  * Zmiana hasła użytkownika po zalogowaniu.
  */
 @Controller
+@Tag(name = "User Management", description = "Operacje związane z zarządzaniem użytkownikami")
 public class ChangePasswordController {
 
     private final UserService userService;
@@ -25,12 +29,38 @@ public class ChangePasswordController {
         this.userService = userService;
     }
 
+    /**
+     * Wyświetla formularz do zmiany hasła
+     *
+     * @return Nazwa widoku formularza zmiany hasła
+     */
+    @Operation(summary = "Wyświetla formularz do zmiany hasła użytkownika")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Formularz wyświetlony pomyślnie"),
+            @ApiResponse(responseCode = "401", description = "Nieautoryzowany dostęp")
+    })
     @GetMapping("/changePassword")
     public String showChangePasswordForm() {
         // Po prostu zwraca formularz
         return "changePassword";
     }
 
+    /**
+     * Procesuje zmianę hasła użytkownika
+     *
+     * @param old_pass  Stare hasło
+     * @param new_pass  Nowe hasło
+     * @param new_pass2 Potwierdzenie nowego hasła
+     * @param model     Model do przekazania danych do widoku
+     * @return Widok formularza zmiany hasła z komunikatami
+     */
+    @Operation(summary = "Procesuje zmianę hasła użytkownika")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Hasło zmienione pomyślnie"),
+            @ApiResponse(responseCode = "400", description = "Nieprawidłowe dane wejściowe"),
+            @ApiResponse(responseCode = "401", description = "Nieautoryzowany dostęp"),
+            @ApiResponse(responseCode = "404", description = "Nieznaleziony użytkownik")
+    })
     @PostMapping("/changePassword")
     public String processChangePassword(
             @RequestParam String old_pass,
