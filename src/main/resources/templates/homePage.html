@@ -6,12 +6,11 @@
     <meta name="keywords" content="tasks, todo, list">
     <title>StudyFlow</title>
 
-    <!-- CSS i skrypty stare, jeśli nie przeszkadzają -->
+    <!-- CSS i skrypty (możesz pozostawić tak jak miałeś) -->
     <link rel="stylesheet" th:href="@{/css/stylehomePage.css}" />
     <script th:src="@{/js/logout.js}" defer></script>
     <script th:src="@{/js/search.js}" defer></script>
-    <!-- WAŻNE: stary taskList.js lepiej ZAKOMENTUJ lub usuń,
-         bo on wywołuje /getTasks?id=..., co nie istnieje. -->
+    <!-- Zakomentuj stary taskList.js, jeśli go masz -->
     <!-- <script th:src="@{/js/taskList.js}" defer></script> -->
     <script th:src="@{/js/changePassword.js}" defer></script>
 </head>
@@ -110,6 +109,8 @@
 
         const pageTitle = document.querySelector('.page-title');
         const taskListLinks = document.querySelectorAll('.TASKLIST');
+        const searchInput = document.getElementById('search');
+        const taskDisplay = document.querySelector('.task-display');
 
         // 1) KLIK W LISTĘ W SIDEBARZE
         taskListLinks.forEach(link => {
@@ -134,78 +135,110 @@
                     const tasks = await response.json();
 
                     // WYCZYŚĆ OBECNE ZADANIA
-                    const taskDisplay = document.querySelector('.task-display');
                     taskDisplay.innerHTML = '';
 
                     // UTWÓRZ NOWE <div> dla każdego zadania w JSON
-                    for (const t of tasks) {
-                        const itemDiv = document.createElement('div');
-                        itemDiv.classList.add('task-item');
-                        itemDiv.dataset.taskId = t.id;
-
-                        const headerDiv = document.createElement('div');
-                        headerDiv.classList.add('task-header');
-
-                        // checkbox
-                        const checkbox = document.createElement('input');
-                        checkbox.type = 'checkbox';
-                        checkbox.classList.add('task-checkbox');
-                        if (t.status === 'completed') {
-                            checkbox.checked = true;
-                        }
-
-                        // name
-                        const nameDiv = document.createElement('div');
-                        nameDiv.classList.add('name');
-                        nameDiv.textContent = t.name;
-                        if (t.status === 'completed') {
-                            nameDiv.classList.add('completed');
-                        }
-
-                        // due date
-                        const dueDateDiv = document.createElement('div');
-                        dueDateDiv.classList.add('due-date');
-                        dueDateDiv.textContent = t.dueDate || '';
-
-                        // status
-                        const statusDiv = document.createElement('div');
-                        statusDiv.classList.add('status');
-                        statusDiv.textContent = (t.status === 'completed') ? 'Zakończone' : 'Do zrobienia';
-
-                        // kosz
-                        const deleteBtn = document.createElement('button');
-                        deleteBtn.classList.add('delete-task-button');
-                        deleteBtn.textContent = '🗑️';
-
-                        // składamy header
-                        headerDiv.appendChild(checkbox);
-                        headerDiv.appendChild(nameDiv);
-                        headerDiv.appendChild(dueDateDiv);
-                        headerDiv.appendChild(statusDiv);
-                        headerDiv.appendChild(deleteBtn);
-
-                        // opis
-                        const descDiv = document.createElement('div');
-                        descDiv.classList.add('description');
-                        descDiv.textContent = t.description || '';
-
-                        itemDiv.appendChild(headerDiv);
-                        itemDiv.appendChild(descDiv);
-
-                        // wstaw do .task-display
-                        taskDisplay.appendChild(itemDiv);
-
-                        // eventy:
-                        checkbox.addEventListener('change', () => toggleTaskStatus(itemDiv));
-                        deleteBtn.addEventListener('click', () => deleteTaskItem(itemDiv));
-                    }
+                    renderTasks(tasks);
                 } catch(e) {
                     console.error('Błąd fetch:', e);
                 }
             });
         });
 
-        // 2) FUNKCJA: toggle status
+        // 2) EVENT: input w polu wyszukiwania
+        searchInput.addEventListener('input', async function() {
+            const query = searchInput.value; // co wpisujesz w polu
+            // znajdź aktualnie wybraną listę
+            const selectedLink = document.querySelector('.TASKLIST.selected');
+            if (!selectedLink) {
+                // brak wybranej listy => nic nie robimy
+                return;
+            }
+            const listId = selectedLink.dataset.tasklistId;
+
+            // fetch -> /api/tasks/tasklists/{listId}/search?query=...
+            try {
+                const response = await fetch(`/api/tasks/tasklists/${listId}/search?query=${encodeURIComponent(query)}`);
+                if (!response.ok) {
+                    console.error('Błąd wyszukiwania:', response.status);
+                    return;
+                }
+                const tasks = await response.json();
+
+                // WYCZYŚĆ + render
+                taskDisplay.innerHTML = '';
+                renderTasks(tasks);
+            } catch(e) {
+                console.error('Error search:', e);
+            }
+        });
+
+        // 3) FUNKCJA: wyrenderuj zadania w .task-display
+        function renderTasks(tasks) {
+            for (const t of tasks) {
+                const itemDiv = document.createElement('div');
+                itemDiv.classList.add('task-item');
+                itemDiv.dataset.taskId = t.id;
+
+                const headerDiv = document.createElement('div');
+                headerDiv.classList.add('task-header');
+
+                // checkbox
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.classList.add('task-checkbox');
+                if (t.status === 'completed') {
+                    checkbox.checked = true;
+                }
+
+                // name
+                const nameDiv = document.createElement('div');
+                nameDiv.classList.add('name');
+                nameDiv.textContent = t.name;
+                if (t.status === 'completed') {
+                    nameDiv.classList.add('completed');
+                }
+
+                // due date
+                const dueDateDiv = document.createElement('div');
+                dueDateDiv.classList.add('due-date');
+                dueDateDiv.textContent = t.dueDate || '';
+
+                // status
+                const statusDiv = document.createElement('div');
+                statusDiv.classList.add('status');
+                statusDiv.textContent = (t.status === 'completed') ? 'Zakończone' : 'Do zrobienia';
+
+                // kosz
+                const deleteBtn = document.createElement('button');
+                deleteBtn.classList.add('delete-task-button');
+                deleteBtn.textContent = '🗑️';
+
+                // składamy header
+                headerDiv.appendChild(checkbox);
+                headerDiv.appendChild(nameDiv);
+                headerDiv.appendChild(dueDateDiv);
+                headerDiv.appendChild(statusDiv);
+                headerDiv.appendChild(deleteBtn);
+
+                // opis
+                const descDiv = document.createElement('div');
+                descDiv.classList.add('description');
+                descDiv.textContent = t.description || '';
+
+                itemDiv.appendChild(headerDiv);
+                itemDiv.appendChild(descDiv);
+
+                // wstaw do .task-display
+                taskDisplay.appendChild(itemDiv);
+
+                // eventy: toggle, delete
+                checkbox.addEventListener('change', () => toggleTaskStatus(itemDiv));
+                deleteBtn.addEventListener('click', () => deleteTaskItem(itemDiv));
+            }
+        }
+
+        // 4) Toggle status
         async function toggleTaskStatus(taskItem) {
             const taskId = taskItem.dataset.taskId;
             const checkbox = taskItem.querySelector('.task-checkbox');
@@ -232,7 +265,7 @@
             }
         }
 
-        // 3) FUNKCJA: usunięcie zadania
+        // 5) Delete task
         async function deleteTaskItem(taskItem) {
             if (!confirm('Na pewno usunąć zadanie?')) return;
             const taskId = taskItem.dataset.taskId;

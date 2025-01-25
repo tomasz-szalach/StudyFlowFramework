@@ -8,6 +8,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+/**
+ * Serwis do zarządzania encjami Task (dodawanie, pobieranie, wyszukiwanie, toggle, usuwanie).
+ */
 @Service
 public class TaskService {
 
@@ -19,7 +22,8 @@ public class TaskService {
     }
 
     @Transactional
-    public String addTask(String name, String description, String dueDate, String status, Long taskListId, Long userId) {
+    public String addTask(String name, String description, String dueDate, String status,
+                          Long taskListId, Long userId) {
         Task task = new Task(name, description, dueDate, status, userId, taskListId);
         taskRepository.save(task);
         return "Zadanie zostało dodane pomyślnie.";
@@ -33,22 +37,23 @@ public class TaskService {
         return taskRepository.findByTaskListIdAndUserId(listId, userId);
     }
 
-    public List<Task> searchTasks(String query, Long taskListId, Long userId) {
-        // jeżeli query jest null, dajemy '', żeby zapytanie nie wywaliło błędu
+    /**
+     * Nowa metoda do wyszukiwania w obrębie listy 'listId' i userId,
+     * według fragmentu 'query' w name/description.
+     */
+    public List<Task> searchTasksInList(Long listId, Long userId, String query) {
         if (query == null) {
             query = "";
         }
-        return taskRepository.searchTasks(query, taskListId, userId);
+        return taskRepository.searchTasks(query, listId, userId);
     }
 
     public Task getTaskById(Long taskId) {
-        // w JPA standardowa metoda to findById
         return taskRepository.findById(taskId).orElse(null);
     }
 
     @Transactional
     public void updateTaskStatus(Long taskId, String status) {
-        // można zrobić przez custom query
         taskRepository.updateTaskStatus(taskId, status);
     }
 
