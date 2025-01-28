@@ -57,7 +57,7 @@ git clone git clone https://github.com/tomasz-szalach/StudyFlowFramework
 ```
 
 2. Configure Application Properties
-   Spring Boot uses application.properties for configuration. Ensure these files are correctly set up with your environment settings. Here's an example of what you might need to configure:
+   - Spring Boot uses application.properties for configuration. Ensure these files are correctly set up with your environment settings. Here's an example of what you might need to configure:
 ```
 spring.datasource.url=jdbc:postgresql://localhost:5432/db
 spring.datasource.username=docker
@@ -100,8 +100,7 @@ pgAdmin: http://localhost:5050
 
 # Entity-Relationship Diagram (ERD)
 
-An ERD (provided as erd.png in the main directory) visually represents the database schema, illustrating the relationships between various entities.
-
+![](ss/diagramerd.png)
 
 # USAGE
 Home Page: The home page displays the latest task lists and provides links to key functionalities such as browsing tasks, logging in, and registering.
