@@ -101,7 +101,7 @@ pgAdmin: http://localhost:5050
 # Entity-Relationship Diagram (ERD)
 
 <p align="center">
-![](ss/diagramerd.png)
+<img src="ss/diagramerd.png">
 </p>
 
 # USAGE
