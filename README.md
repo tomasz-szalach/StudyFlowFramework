@@ -93,9 +93,9 @@ docker-compose up
 
 4. Access the Application:
 
-Web app: http://localhost:8080
-Swagger UI: http://localhost:8080/swagger-ui/index.html
-pgAdmin: http://localhost:5050
+- Web app: http://localhost:8080
+- Swagger UI: http://localhost:8080/swagger-ui/index.html
+- pgAdmin: http://localhost:5050
 
 
 # Entity-Relationship Diagram (ERD)
