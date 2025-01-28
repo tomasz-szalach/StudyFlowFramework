@@ -1,6 +1,6 @@
 
 <p align="center">
-<img src="public/img/logo.svg" width="250" height="250">
+<img src="ss/logo.svg" width="250" height="250">
 </p>
 
 # StudyFlow
@@ -136,6 +136,6 @@ API Endpoints: Thanks to the integration with Swagger UI, you can browse and tes
 
 
 Contact
-Author: Tomasz Szałach
-Email: tomek.sza01@gmail.com
-GitHub: https://github.com/tomasz-szalach
+- Author: Tomasz Szałach
+- Email: tomek.sza01@gmail.com
+- GitHub: https://github.com/tomasz-szalach
