@@ -38,10 +38,7 @@ public class AddTaskController {
     }
 
     /**
-     * Pokaż formularz do dodawania zadania
-     *
-     * @param model Model do przekazania danych do widoku
-     * @return Nazwa widoku
+     * Formularz do dodawania zadania
      */
     @Operation(summary = "Wyświetla formularz do dodawania nowego zadania")
     @ApiResponses(value = {

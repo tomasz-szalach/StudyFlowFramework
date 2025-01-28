@@ -6,13 +6,9 @@
     <meta name="keywords" content="tasks, todo, list">
     <title>StudyFlow</title>
 
-    <!-- Style i skrypty -->
     <link rel="stylesheet" th:href="@{/css/stylehomePage.css}" />
     <script th:src="@{/js/logout.js}" defer></script>
     <script th:src="@{/js/search.js}" defer></script>
-    <!-- ewentualnie zakomentuj starego taskList.js, jeśli jest
-         <script th:src="@{/js/taskList.js}" defer></script>
-    -->
     <script th:src="@{/js/changePassword.js}" defer></script>
 </head>
 <body>
@@ -32,7 +28,6 @@
     <aside class="sidebar">
         <div class="tasklist-display">
             <h3>Twoje listy zadań</h3>
-            <!-- Listy zadań generowane przez Thymeleaf, wczytane w HomeController -->
             <div th:if="${taskLists != null}">
                 <div th:each="taskList, iter : ${taskLists}">
                     <div class="home-blocks">
@@ -68,19 +63,15 @@
             <span class="search-icon">&#128269;</span>
         </div>
 
-        <!-- PRZYWRÓCENIE linku do /addTaskPage -->
         <a class="create-task-button" th:href="@{/addTaskPage}">
             Utwórz nowe zadanie
         </a>
 
-        <!-- Zadania (dynamicznie wypełniane przez JS + /api/...) -->
         <section class="task-display">
-            <!-- Nic nie ma na starcie, JS wypełni w kliku listy -->
         </section>
     </main>
 </div>
 
-<!-- Szablon do klonowania w JS (opcjonalnie). -->
 <template id="task-template">
     <div class="task-item" data-task-id="">
         <div class="task-header">

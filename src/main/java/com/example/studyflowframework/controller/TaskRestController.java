@@ -43,10 +43,6 @@ public class TaskRestController {
         this.userRepository = userRepository;
     }
 
-    //------------------------------------------
-    // Nowe: uniwersalne CRUD endpointy
-    //------------------------------------------
-
     /**
      * Pobiera pojedyncze zadanie (jeśli należy do zalogowanego usera).
      *
@@ -161,11 +157,7 @@ public class TaskRestController {
         taskService.deleteTask(taskId);
         return ResponseEntity.noContent().build();
     }
-
-    //------------------------------------------
-    // Twoje poprzednie endpointy
-    //------------------------------------------
-
+    
     /**
      * Zwraca listę zadań dla określonej listy zadań i użytkownika.
      *

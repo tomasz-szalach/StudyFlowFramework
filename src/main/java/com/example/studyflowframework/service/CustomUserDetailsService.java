@@ -13,7 +13,7 @@ import java.util.Optional;
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder; // jeśli chcesz hashować przy rejestracji
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public CustomUserDetailsService(UserRepository userRepository,

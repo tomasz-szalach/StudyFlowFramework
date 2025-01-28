@@ -6,7 +6,6 @@
     <meta name="keywords" content="tasks, todo, list">
     <title>StudyFlow - Add Task List</title>
 
-    <!-- Skorzystamy z już gotowego stylu (np. styleRegistration.css) czy innego -->
     <link rel="stylesheet" th:href="@{/css/styleRegistration.css}" />
 </head>
 <body>
@@ -21,13 +20,9 @@
                 <section class="ContainerBox">
                     <h1 class="SignUp-Title">Dodaj nową listę zadań</h1>
 
-                    <!--
-                        W starym PHP: <form action="createTaskList" method="POST">
-                        W Thymeleaf: th:action="@{/createTaskList}"
-                    -->
+
                     <form class="SignUp-form" th:action="@{/createTaskList}" method="POST">
 
-                        <!-- Blok z komunikatami, np. messages -->
                         <div class="messages" th:if="${messages}">
                             <p th:each="msg : ${messages}" th:text="${msg}"></p>
                         </div>
@@ -45,7 +40,6 @@
                                 Dodaj listę
                             </button>
                             <div class="SignUp-optionlink">
-                                <!-- Zamiast <a href="homePage"> -->
                                 <a th:href="@{/home}">Powrót</a>
                             </div>
                         </div>

@@ -20,7 +20,6 @@ public class RedisConfig {
 
     /**
      * Kanał, na którym publikujemy info o rejestracji użytkownika.
-     * Nazwę "user_registration" możesz dowolnie zmienić.
      */
     @Bean
     public ChannelTopic userRegistrationTopic() {
@@ -29,20 +28,17 @@ public class RedisConfig {
 
     /**
      * RedisTemplate – używane do publish/subscribe.
-     * Tutaj klucze i wartości są serializowane jako String,
-     * ale generyki <String, Object>.
      */
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
 
-        // Serializatory tekstowe (unikamy krzaczków).
+        // Serializatory tekstowe
         StringRedisSerializer stringSerializer = new StringRedisSerializer();
         template.setKeySerializer(stringSerializer);
         template.setValueSerializer(stringSerializer);
 
-        // Opcjonalnie także hashKey, hashValue:
         template.setHashKeySerializer(stringSerializer);
         template.setHashValueSerializer(stringSerializer);
 

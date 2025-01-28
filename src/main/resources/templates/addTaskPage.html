@@ -21,10 +21,6 @@
         </div>
 
         <section class="add-task">
-            <!--
-                W starym PHP: <form action="addTask" method="POST">
-                W Thymeleaf: th:action="@{/addTask}"
-            -->
             <form th:action="@{/addTask}" method="POST">
 
                 <label for="task-name">Wpisz nazwę nowego zadania</label>
@@ -38,15 +34,7 @@
 
                 <label for="task-list">Wybierz listę zadań</label>
                 <select id="task-list" name="task_list_id" required>
-                    <!-- Stary kod:
-                         <?php foreach($taskLists as $taskList): ?>
-                           <option value="<?= $taskList['id'] ?>"><?= htmlspecialchars($taskList['name']) ?></option>
-                         <?php endforeach; ?>
-                       W Thymeleaf:
-                       th:each="taskList : ${taskLists}"
-                       th:value="${taskList.id}"
-                       th:text="${taskList.name}"
-                    -->
+
                     <option th:each="taskList : ${taskLists}"
                             th:value="${taskList.id}"
                             th:text="${taskList.name}">
@@ -56,7 +44,6 @@
 
                 <div class="buttons">
                     <button type="submit" class="add-button">Dodaj zadanie</button>
-                    <!-- Zamiast <a href="homePage" ...> -> <a th:href="@{/home}"> -->
                     <a th:href="@{/home}" class="cancel-button">Anuluj</a>
                 </div>
             </form>

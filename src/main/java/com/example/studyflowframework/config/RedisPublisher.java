@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 /**
  * Klasa do publikowania komunikatów w Redis (Pub).
- * Np. przy rejestracji usera – wywołujesz publishUserRegistration(email).
  */
 @Service
 public class RedisPublisher {

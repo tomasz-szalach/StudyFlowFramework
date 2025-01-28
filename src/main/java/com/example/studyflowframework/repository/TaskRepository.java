@@ -14,26 +14,10 @@ import java.util.List;
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {
 
-    /**
-     * Pobieranie zadań danego usera (bez listy).
-     * (Jeśli chcesz też posortować globalnie, można dopisać order by).
-     */
     List<Task> findByUserId(Long userId);
 
-    /**
-     * Pobieranie zadań w obrębie konkretnej listy i użytkownika,
-     * POSORTOWANE rosnąco po dueDate.
-     *
-     * W Spring Data można to osiągnąć przez nazewnictwo:
-     * findByTaskListIdAndUserIdOrderByDueDateAsc
-     */
     List<Task> findByTaskListIdAndUserIdOrderByDueDateAsc(Long taskListId, Long userId);
 
-    /**
-     * Wyszukiwanie zadań w obrębie danej listy i użytkownika
-     * po fragmencie (query) w name lub description,
-     * z uwzględnieniem sortowania rosnąco po dueDate.
-     */
     @Query("""
         SELECT t
         FROM Task t
@@ -62,6 +46,5 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 
     /**
      * Usuwanie zadania -> wbudowana metoda deleteById(taskId).
-     * Nie musimy pisać custom.
      */
 }

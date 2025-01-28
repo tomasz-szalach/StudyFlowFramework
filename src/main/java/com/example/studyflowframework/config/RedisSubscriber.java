@@ -22,7 +22,6 @@ public class RedisSubscriber {
     public void onMessage(String message, String pattern) {
         System.out.println("[REDIS] Odebrano komunikat: " + message);
 
-        // Przykład: wysyłamy mail
         try {
             mailService.sendWelcomeEmail(message);
             System.out.println("[REDIS] Wyslano mail powitalny do: " + message);
