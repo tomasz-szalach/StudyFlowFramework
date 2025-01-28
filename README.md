@@ -100,7 +100,9 @@ pgAdmin: http://localhost:5050
 
 # Entity-Relationship Diagram (ERD)
 
+<p align="center">
 ![](ss/diagramerd.png)
+</p>
 
 # USAGE
 Home Page: The home page displays the latest task lists and provides links to key functionalities such as browsing tasks, logging in, and registering.
