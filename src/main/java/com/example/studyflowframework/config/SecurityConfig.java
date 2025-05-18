@@ -1,7 +1,9 @@
 package com.example.studyflowframework.config;
 
+import com.example.studyflowframework.security.CustomAuthenticationSuccessHandler;
 import com.example.studyflowframework.service.CustomUserDetailsService;
 import com.example.studyflowframework.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+
 
 /**
  * Konfiguracja Spring Security
@@ -57,6 +60,8 @@ public class SecurityConfig {
         return authBuilder.build();
     }
 
+    @Autowired
+    private CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
     /**
      * Główna konfiguracja łańcucha filtrów i logowania
      */
@@ -66,7 +71,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         // Ścieżki publiczne
-                        .requestMatchers("/error", "/login", "/css/**", "/js/**", "/img/**", "/registrationUser")
+                        .requestMatchers("/error", "/login", "/css/**", "/js/**", "/img/**", "/registrationUser", "/verify-mfa")
                         .permitAll()
                         // Reszta wymaga autentykacji
                         .anyRequest().authenticated()
@@ -76,7 +81,7 @@ public class SecurityConfig {
                         // Po błędnych danych -> ?error
                         .failureUrl("/login?error")
                         // Po udanym logowaniu -> /home
-                        .defaultSuccessUrl("/home", true)
+                        .successHandler(customAuthenticationSuccessHandler)
                         .permitAll()
                 );
         return http.build();

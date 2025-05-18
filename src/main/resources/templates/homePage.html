@@ -6,12 +6,14 @@
     <meta name="keywords" content="tasks, todo, list">
     <title>StudyFlow</title>
 
-    <link rel="stylesheet" th:href="@{/css/stylehomePage.css}" />
-    <script th:src="@{/js/logout.js}" defer></script>
-    <script th:src="@{/js/search.js}" defer></script>
+    <link rel="stylesheet" th:href="@{/css/stylehomePage.css}"/>
+    <script th:src="@{/js/logout.js}"        defer></script>
+    <script th:src="@{/js/search.js}"        defer></script>
     <script th:src="@{/js/changePassword.js}" defer></script>
+    <script src="/js/homepage.js"             defer></script>
 </head>
 <body>
+<!-- ░░─ GŁÓWNY TOPBAR ─░░ -->
 <div id="TopBar">
     <img class="logo" th:src="@{/img/logo.svg}" alt="Logo">
     <div id="User-profile">
@@ -24,247 +26,94 @@
     </div>
 </div>
 
+<!-- ░░─ LAYOUT ─░░ -->
 <div id="container-page">
+    <!-- ≡≡ SIDEBAR ≡≡ -->
     <aside class="sidebar">
         <div class="tasklist-display">
             <h3>Twoje listy zadań</h3>
+
+            <!-- listy zadań -->
             <div th:if="${taskLists != null}">
-                <div th:each="taskList, iter : ${taskLists}">
+                <div th:each="taskList,iter:${taskLists}">
                     <div class="home-blocks">
+                        <!-- link wybierający listę -->
                         <a class="TASKLIST"
-                           th:classappend="${iter.index} == 0 ? ' selected' : ''"
+                           th:classappend="${iter.index}==0 ? ' selected' : ''"
                            href="#"
                            th:attr="data-tasklist-id=${taskList.id}">
                             <div class="TASKLIST-choose">
                                 <span class="tasklist-icon">&#x1F4CB;</span>
-                                <div class="name" th:text="${taskList.name}">Nazwa listy</div>
+                                <div class="name"
+                                     th:text="${taskList.name}">Nazwa listy</div>
                             </div>
+                            <!-- przycisk menu kontekstowego -->
+                            <button class="list-menu-btn"
+                                    type="button"
+                                    title="Opcje"
+                                    th:attr="data-id=${taskList.id}">⋮</button>
                         </a>
                     </div>
                 </div>
             </div>
 
-            <!-- PRZYWRÓCENIE linku do /addTaskList -->
             <a class="add-tasklist" th:href="@{/addTaskList}">
                 Dodaj nową listę zadań
             </a>
         </div>
     </aside>
 
+    <!-- ≡≡ MAIN ≡≡ -->
     <main class="main-content">
-        <div class="Page-Title-Bar">
-            <span class="page-title">
-                Zadania <span th:text="${activeListName}">Domyślna lista</span>
-            </span>
+        <!-- gdy istnieją listy -->
+        <div th:if="${taskLists != null and !taskLists.isEmpty()}">
+            <div class="Page-Title-Bar">
+                <span class="page-title">
+                    Zadania <span th:text="${activeListName}">Domyślna lista</span>
+                </span>
+            </div>
+
+            <div class="search-bar">
+                <input id="search" placeholder="Znajdź zadanie"/>
+                <span class="search-icon">&#128269;</span>
+            </div>
+
+            <div class="create-task-container">
+                <a class="create-task-button" th:href="@{/addTaskPage}">
+                    Utwórz nowe zadanie
+                </a>
+            </div>
+
+            <section class="task-display"></section>
         </div>
 
-        <div class="search-bar">
-            <input id="search" placeholder="Znajdź zadanie" />
-            <span class="search-icon">&#128269;</span>
+        <!-- gdy nie ma jeszcze żadnych list -->
+        <div th:unless="${taskLists != null and !taskLists.isEmpty()}"
+             class="empty-state">
+            <h2>Witaj w StudyFlow</h2>
+            <p>Nie masz jeszcze żadnych list zadań.</p>
+            <p>Aby rozpocząć, utwórz swoją pierwszą listę zadań.</p>
+            <a class="add-tasklist-button" th:href="@{/addTaskList}">
+                Dodaj nową listę
+            </a>
         </div>
-
-        <a class="create-task-button" th:href="@{/addTaskPage}">
-            Utwórz nowe zadanie
-        </a>
-
-        <section class="task-display">
-        </section>
     </main>
 </div>
 
+<!-- szablon pojedynczego zadania -->
 <template id="task-template">
     <div class="task-item" data-task-id="">
         <div class="task-header">
             <input type="checkbox" class="task-checkbox">
             <div class="name">Task Name</div>
             <div class="due-date">Due Date</div>
-            <div class="status">Status</div>
+            <div class="status-box"><div class="status">Status</div></div>
             <button class="delete-task-button">🗑️</button>
         </div>
         <div class="description">Task Description</div>
     </div>
 </template>
 
-<footer>
-    <p>&copy; 2024 StudyFlow</p>
-</footer>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-
-        const pageTitle = document.querySelector('.page-title');
-        const taskListLinks = document.querySelectorAll('.TASKLIST');
-        const searchInput = document.getElementById('search');
-        const taskDisplay = document.querySelector('.task-display');
-
-        // 1) Klik w listę => pobieranie zadań danej listy
-        taskListLinks.forEach(link => {
-            link.addEventListener('click', async (ev) => {
-                ev.preventDefault();
-                // UI: .selected
-                taskListLinks.forEach(l => l.classList.remove('selected'));
-                link.classList.add('selected');
-
-                // Nazwa + ID
-                const listName = link.querySelector('.name').textContent;
-                pageTitle.textContent = 'Zadania ' + listName;
-                const listId = link.dataset.tasklistId;
-
-                // GET /api/tasks/tasklists/{listId}/tasks
-                try {
-                    const response = await fetch(`/api/tasks/tasklists/${listId}/tasks`);
-                    if (!response.ok) {
-                        console.error('Błąd pobierania zadań listy:', response.status);
-                        return;
-                    }
-                    const tasks = await response.json();
-
-                    // Czyścimy
-                    taskDisplay.innerHTML = '';
-
-                    // Render zadań
-                    renderTasks(tasks);
-                } catch(e) {
-                    console.error('Błąd fetch:', e);
-                }
-            });
-        });
-
-        // 2) Wyszukiwanie w polu #search
-        searchInput.addEventListener('input', async function() {
-            const query = searchInput.value;
-            const selectedLink = document.querySelector('.TASKLIST.selected');
-            if (!selectedLink) return; // brak wybranej listy
-            const listId = selectedLink.dataset.tasklistId;
-
-            // GET /api/tasks/tasklists/{listId}/search?query=...
-            try {
-                const response = await fetch(`/api/tasks/tasklists/${listId}/search?query=${encodeURIComponent(query)}`);
-                if (!response.ok) {
-                    console.error('Błąd wyszukiwania:', response.status);
-                    return;
-                }
-                const tasks = await response.json();
-                taskDisplay.innerHTML = '';
-                renderTasks(tasks);
-            } catch(e) {
-                console.error('Error search:', e);
-            }
-        });
-
-        // 3) Po starcie symulujemy klik w pierwszą listę
-        const defaultList = document.querySelector('.TASKLIST.selected');
-        if (defaultList) {
-            defaultList.click();
-        }
-
-        // 4) renderTasks
-        function renderTasks(tasks) {
-            for (const t of tasks) {
-                const itemDiv = document.createElement('div');
-                itemDiv.classList.add('task-item');
-                itemDiv.dataset.taskId = t.id;
-
-                const headerDiv = document.createElement('div');
-                headerDiv.classList.add('task-header');
-
-                // checkbox
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.classList.add('task-checkbox');
-                if (t.status === 'completed') {
-                    checkbox.checked = true;
-                }
-
-                // nazwa
-                const nameDiv = document.createElement('div');
-                nameDiv.classList.add('name');
-                nameDiv.textContent = t.name;
-                if (t.status === 'completed') {
-                    nameDiv.classList.add('completed');
-                }
-
-                // data
-                const dueDateDiv = document.createElement('div');
-                dueDateDiv.classList.add('due-date');
-                dueDateDiv.textContent = t.dueDate || '';
-
-                // status
-                const statusDiv = document.createElement('div');
-                statusDiv.classList.add('status');
-                statusDiv.textContent = (t.status === 'completed') ? 'Zakończone' : 'Do zrobienia';
-
-                // kosz
-                const deleteBtn = document.createElement('button');
-                deleteBtn.classList.add('delete-task-button');
-                deleteBtn.textContent = '🗑️';
-
-                // składamy
-                headerDiv.appendChild(checkbox);
-                headerDiv.appendChild(nameDiv);
-                headerDiv.appendChild(dueDateDiv);
-                headerDiv.appendChild(statusDiv);
-                headerDiv.appendChild(deleteBtn);
-
-                const descDiv = document.createElement('div');
-                descDiv.classList.add('description');
-                descDiv.textContent = t.description || '';
-
-                itemDiv.appendChild(headerDiv);
-                itemDiv.appendChild(descDiv);
-
-                taskDisplay.appendChild(itemDiv);
-
-                // eventy: toggle, delete
-                checkbox.addEventListener('change', () => toggleTaskStatus(itemDiv));
-                deleteBtn.addEventListener('click', () => deleteTaskItem(itemDiv));
-            }
-        }
-
-        // 5) Toggle status => PATCH /api/tasks/{id}/toggle
-        async function toggleTaskStatus(taskItem) {
-            const taskId = taskItem.dataset.taskId;
-            const checkbox = taskItem.querySelector('.task-checkbox');
-            try {
-                const resp = await fetch(`/api/tasks/${taskId}/toggle`, { method: 'PATCH' });
-                if (!resp.ok) {
-                    console.error('toggle error', resp.status);
-                    checkbox.checked = !checkbox.checked;
-                    return;
-                }
-                const newStatus = await resp.text();
-                const nameDiv = taskItem.querySelector('.name');
-                const statusDiv = taskItem.querySelector('.status');
-
-                if (newStatus === 'completed') {
-                    nameDiv.classList.add('completed');
-                    statusDiv.textContent = 'Zakończone';
-                } else {
-                    nameDiv.classList.remove('completed');
-                    statusDiv.textContent = 'Do zrobienia';
-                }
-            } catch(e) {
-                console.error('toggle exception', e);
-                checkbox.checked = !checkbox.checked;
-            }
-        }
-
-        // 6) Delete task => DELETE /api/tasks/{id}
-        async function deleteTaskItem(taskItem) {
-            if (!confirm('Na pewno usunąć zadanie?')) return;
-            const taskId = taskItem.dataset.taskId;
-            try {
-                const resp = await fetch(`/api/tasks/${taskId}`, { method: 'DELETE' });
-                if (!resp.ok) {
-                    console.error('delete error', resp.status);
-                    return;
-                }
-                taskItem.remove();
-            } catch(e) {
-                console.error('delete exception', e);
-            }
-        }
-    });
-</script>
+<footer><p>&copy; 2024 StudyFlow</p></footer>
 </body>
 </html>
