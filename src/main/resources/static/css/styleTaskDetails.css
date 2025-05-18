@@ -1,0 +1,33 @@
+@import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap");
+:root{
+    --acc:#1f89bf; --bg:#f0f2f5; --font:#303035; --rad:.8rem;
+}
+*{box-sizing:border-box;font-family:"Quicksand",sans-serif;color:var(--font);}
+body{margin:0;background:var(--bg);}
+#TopBar{display:flex;align-items:center;gap:2rem;
+    background:#e6e7e8;padding:1rem 2rem;}
+.logo{height:38px}
+.back-btn{background:none;border:none;font-size:1.6rem;cursor:pointer;}
+
+.wrapper{max-width:540px;margin:3rem auto;background:#fff;
+    border-radius:1.2rem;padding:3rem 3.4rem;box-shadow:0 10px 25px #0002;}
+h1{margin:0 0 2.4rem;font-size:2.2rem;text-align:center}
+
+form{display:flex;flex-direction:column;gap:1.6rem;font-size:1.4rem;}
+label{display:flex;flex-direction:column;gap:.4rem;font-weight:600}
+input[type=text],input[type=date],select,textarea{
+    font-size:1.4rem;padding:.9rem 1.2rem;border:1px solid #cfd4d9;
+    border-radius:var(--rad);background:#fff;resize:vertical;
+}
+input:focus,select:focus,textarea:focus{
+    outline:none;border-color:var(--acc);box-shadow:0 0 0 3px #1f89bf33;
+}
+.status-box{flex-direction:row;align-items:center;gap:.8rem;font-weight:600}
+
+.actions{display:flex;justify-content:flex-end;gap:1.2rem;margin-top:.8rem}
+.actions .save{background:var(--acc);color:#fff;border:none;
+    padding:.9rem 2.2rem;border-radius:var(--rad);cursor:pointer}
+.actions .delete{background:#f44336;color:#fff;border:none;
+    padding:.9rem 2.2rem;border-radius:var(--rad);cursor:pointer}
+.actions .save:hover{background:#186d97}
+.actions .delete:hover{background:#d6362a}

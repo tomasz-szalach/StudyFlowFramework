@@ -25,6 +25,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const MapPr   = { HIGH:0, MEDIUM:1, LOW:2 };                // pomoc do sortowania po priorytecie
     const mapText = { due:'Termin wykonania', priority:'Priorytet',
         created:'Data utworzenia', alpha:'Alfabetycznie' };
+    const truncate = (str, n = 140) =>
+        str && str.length > n ? str.slice(0, n).trimEnd() + '…' : str;
 
     function deadlineLabel(d){
         if(!d) return null;
@@ -233,11 +235,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const del = document.createElement('button'); del.className='delete-task-button'; del.textContent='🗑️';
 
         header.append(cb,name,dueDiv,box,del);
-        const desc = document.createElement('div'); desc.className='description'; desc.textContent=t.description||'';
+        const desc = document.createElement('div'); desc.className='description'; desc.textContent = truncate(t.description);
         item.append(header,desc);
 
         cb .addEventListener('change', ()=>toggleStatus(item));
         del.addEventListener('click',   ()=>deleteTask(item));
+
+        item.addEventListener('click', e=>{
+            // żeby klik na 🗑 lub checkbox nie otwierał strony
+            if(e.target.closest('.task-checkbox, .delete-task-button')) return;
+            window.location.href = `/task/${t.id}`;
+        });
+
         return item;
     }
 

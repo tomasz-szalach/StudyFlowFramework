@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>Szczegóły zadania – StudyFlow</title>
+
+    <link rel="stylesheet" th:href="@{/css/stylehomePage.css}">
+    <link rel="stylesheet" th:href="@{/css/taskDetails.css}">
+</head>
+<body>
+
+<!-- Top-Bar -->
+<div id="TopBar">
+    <img class="logo" th:src="@{/img/logo.svg}" alt="Logo">
+</div>
+
+<!-- karta -->
+<div class="details-wrap">
+
+    <h2 class="details-title">Edycja zadania</h2>
+
+    <form id="editForm" class="details-form"
+          th:object="${task}"
+          th:action="@{'/api/tasks/' + ${task.id}}" method="put">
+
+        <!-- kolumna A -->
+        <div class="form-col">
+
+            <label>Nazwa zadania
+                <input th:field="*{name}" required>
+            </label>
+
+            <label>Termin wykonania
+                <input type="date" th:field="*{dueDate}">
+            </label>
+
+            <label>Priorytet
+                <select th:field="*{priority}">
+                    <option value="LOW">Niski</option>
+                    <option value="MEDIUM">Średni</option>
+                    <option value="HIGH">Wysoki</option>
+                </select>
+            </label>
+
+            <label>Lista zadań
+                <select th:field="*{taskListId}">
+                    <option th:each="l : ${taskLists}"
+                            th:value="${l.id}"
+                            th:text="${l.name}">
+                    </option>
+                </select>
+            </label>
+
+            <label>Status
+                <select th:field="*{status}">
+                    <option value="todo">Do zrobienia</option>
+                    <option value="completed">Zakończone</option>
+                </select>
+            </label>
+        </div>
+
+        <!-- kolumna B -->
+        <div class="form-col">
+            <label>Opis (do 1000 znaków)
+                <textarea id="desc" th:field="*{description}" maxlength="1000"></textarea>
+                <span id="counter" class="counter">0 / 1000</span>
+            </label>
+        </div>
+
+        <!-- akcje -->
+        <div class="details-actions">
+            <button type="submit"  class="btn-primary">Zapisz</button>
+            <a      th:href="@{/home}" class="btn-secondary">Powrót</a>
+            <button type="button" id="deleteBtn" class="btn-danger">Usuń</button>
+        </div>
+    </form>
+</div>
+
+<!-- toast -->
+<div id="toast" class="toast">Zapisano zmiany</div>
+
+<script src="/js/modal.js"></script>
+<script src="/js/taskDetails.js"></script>
+</body>
+</html>

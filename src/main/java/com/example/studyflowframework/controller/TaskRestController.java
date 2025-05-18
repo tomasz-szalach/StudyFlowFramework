@@ -111,26 +111,28 @@ public class TaskRestController {
     @PutMapping("/{id}")
     public ResponseEntity<Task> updateTask(@PathVariable Long id,
                                            @RequestBody Task updated) {
+        // kto jest zalogowany
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = findUserOrThrow(email);
 
-        // Znajdź stare zadanie
+        // stary rekord
         Task existing = taskService.getTaskById(id);
-        if (existing == null || !existing.getUserId().equals(user.getId())) {
-            return ResponseEntity.<Task>notFound().build();
-        }
+        if (existing == null || !existing.getUserId().equals(user.getId()))
+            return ResponseEntity.notFound().build();
 
-        // Nadpisz pola
-        existing.setName(updated.getName());
-        existing.setDescription(updated.getDescription());
-        existing.setDueDate(updated.getDueDate());
-        existing.setStatus(updated.getStatus());
-        existing.setTaskListId(updated.getTaskListId());
-        existing.setUserId(user.getId());
+        // ►► NADPISUJEMY WSZYSTKIE POLA ◄◄
+        existing.setName        (updated.getName());
+        existing.setDescription (updated.getDescription());
+        existing.setDueDate     (updated.getDueDate());
+        existing.setStatus      (updated.getStatus());
+        existing.setTaskListId  (updated.getTaskListId());
+        existing.setPriority    (updated.getPriority());   // ← było po save!
+        existing.setUserId      (user.getId());
 
         Task saved = taskService.saveTask(existing);
         return ResponseEntity.ok(saved);
     }
+
 
     /**
      * Usuwa zadanie.
@@ -246,4 +248,6 @@ public class TaskRestController {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
     }
+
+
 }

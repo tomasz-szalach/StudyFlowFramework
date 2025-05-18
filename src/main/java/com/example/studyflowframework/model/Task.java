@@ -2,10 +2,9 @@ package com.example.studyflowframework.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 
-/**
- * Model reprezentujący zadanie.
- */
+/** Model reprezentujący zadanie. */
 @Entity
 @Table(name = "tasks")
 @Schema(description = "Model reprezentujący zadanie")
@@ -19,15 +18,16 @@ public class Task {
     }
 
     /* ---------- POLA ---------- */
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Schema(description = "Unikalny identyfikator zadania", example = "1")
     private Long id;
 
-    @Schema(description = "Nazwa zadania", example = "Przygotować prezentację")
+    @Schema(description = "Nazwa zadania", example = "Prezentacja z Spring Boot")
     private String name;
 
-    @Schema(description = "Opis zadania", example = "Przygotować prezentację na temat Spring Boot")
+    @Size(max = 1000)
+    @Column(length = 1000)
+    @Schema(description = "Opis zadania (max 1000 znaków)")
     private String description;
 
     @Schema(description = "Data wykonania zadania", example = "2025-02-15")
@@ -46,9 +46,9 @@ public class Task {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Schema(description = "Priorytet zadania", example = "LOW")
-    private Priority priority = Priority.LOW;     // ⇦ domyślnie „niski”
+    private Priority priority = Priority.LOW;
 
-    /* ---------- Konstruktory ---------- */
+    /* ---------- konstruktory ---------- */
     public Task() {}
 
     public Task(String name, String description, String dueDate,
@@ -81,7 +81,8 @@ public class Task {
 
     public void setId(Long id)                  { this.id = id; }
     public void setName(String name)            { this.name = name; }
-    public void setDescription(String d)        { this.description = d; }
+    public void setDescription(String d){ this.description =
+            d != null && d.length() > 1000 ? d.substring(0,1000) : d; }
     public void setDueDate(String dueDate)      { this.dueDate = dueDate; }
     public void setStatus(String status)        { this.status = status; }
     public void setUserId(Long userId)          { this.userId = userId; }
