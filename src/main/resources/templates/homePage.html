@@ -18,7 +18,9 @@
     <img class="logo" th:src="@{/img/logo.svg}" alt="Logo">
     <div id="User-profile">
         <div class="User-profile2" onclick="logout(this)"><span class="Logout">Wyloguj się</span></div>
-        <a class="User-profile2" th:href="@{/changePassword}"><span class="ChangePassword">Zmień hasło</span></a>
+        <a class="User-profile2" th:href="@{/account}">
+            <span class="ChangePassword">👤&nbsp;Konto</span>
+        </a>
     </div>
 </div>
 

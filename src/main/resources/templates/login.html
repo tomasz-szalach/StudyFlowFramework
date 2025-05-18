@@ -1,73 +1,44 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="pl" xmlns:th="https://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
-    <meta name="description" content="Zaloguj się na StudyFlow">
-    <meta name="keywords" content="login, konto, StudyFlow">
-    <title>StudyFlow</title>
-    <link rel="stylesheet" th:href="@{/css/styleLogin.css}" />
-    <script th:src="@{/js/togglePassword.js}" defer></script>
-    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <title>Logowanie – StudyFlow</title>
+
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+    <script defer th:src="@{/js/login.js}"></script>
 </head>
 <body>
-<div id="Page_topbar">
-    <img class="Logo-small" th:src="@{/img/logo.svg}" alt="StudyFlow Logo">
-</div>
-<div id="container">
-    <div id="root">
-        <div class="PageContainer">
-            <section class="Login-section">
-                <section class="ContainerBox">
-                    <h1 class="Login-Title">Login</h1>
 
-                    <!--
-                       Jeśli param.error jest obecny w URL (/?error),
-                       to wyświetlam komunikat:
-                    -->
-                    <div th:if="${param.error}"
-                         style="color:red; font-weight:bold; margin-bottom:1em;">
-                        Niepoprawne dane logowania!
-                    </div>
+<div id="TopBar"><img class="logo" th:src="@{/img/logo.svg}" alt="logo"></div>
 
-                    <!--
-                      Formularz Spring Security -> POST /login
-                      Pola: name="username", name="password"
-                    -->
-                    <form class="Login-form" th:action="@{/login}" method="post">
-                        <div class="Input-container">
-                            <input class="Input_input"
-                                   type="text"
-                                   name="username"
-                                   placeholder="E-mail"
-                                   required />
-                        </div>
+<div class="card-wrap">
+    <h2 class="card-title">Zaloguj się</h2>
 
-                        <div class="Input-container">
-                            <input class="Input_input Input_input_password"
-                                   type="password"
-                                   name="password"
-                                   placeholder="Hasło"
-                                   required />
-                        </div>
+    <form class="auth-form" th:action="@{/login}" method="post">
 
-                        <label class="Login-checkBox">
-                            <input type="checkbox" onchange="togglePassword(this)">
-                            <em>Pokaż hasło</em>
-                        </label>
-
-                        <div class="Login-formOptions">
-                            <button class="ButtonLogin" type="submit">Zaloguj się</button>
-                            <div class="Login-optionlink">
-                                <a th:href="@{/registrationUser}">Utwórz konto</a>
-                            </div>
-                        </div>
-                    </form>
-                </section>
-
-                <img class="Login-logo" th:src="@{/img/logo.svg}" alt="StudyFlow Logo">
-            </section>
+        <div class="field">
+            <label>E-mail</label>
+            <input type="email" name="username" required>
         </div>
-    </div>
+
+        <div class="field">
+            <label>Hasło</label>
+
+            <div class="pwd-inner">
+                <input type="password" name="password" required>
+                <button type="button" class="toggle eye">👁</button>
+            </div>
+        </div>
+
+        <button class="btn-primary">Zaloguj</button>
+
+        <p th:if="${param.error}"  class="error-msg">Niepoprawne dane logowania.</p>
+        <p th:if="${param.logout}" class="success-msg">Wylogowano pomyślnie.</p>
+    </form>
+
+    <p class="note">Nie masz konta?
+        <a th:href="@{/registrationUser}">Zarejestruj się</a></p>
 </div>
+
 </body>
 </html>

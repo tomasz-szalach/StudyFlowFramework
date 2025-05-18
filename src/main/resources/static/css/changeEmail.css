@@ -1,10 +1,9 @@
-/* — Quicksand + paleta jak w taskDetails — */
+/* — Quicksand + wspólna paleta — */
 @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap');
 
 :root{
-    --acc:#1f89bf;
+    --acc:#1f89bf;          /* kolor akcentu */
     --bg:#f0f2f5;
-    --bg-card:#fff;
     --border:#dadde1;
     --radius:1rem;
     --font:'Quicksand',sans-serif;
@@ -17,7 +16,7 @@ body{
     color:#333;
 }
 
-/* === TopBar === */
+/* ---------- TopBar ---------- */
 #TopBar{
     height:58px;
     background:#e6e7e8;
@@ -27,11 +26,11 @@ body{
 }
 #TopBar .logo{height:36px}
 
-/* === karta + animacja === */
-.card-wrap{
-    max-width:940px;
-    margin:24px auto 32px;
-    background:var(--bg-card);
+/* ---------- karta + fade-in ---------- */
+.card{
+    max-width:540px;
+    margin:40px auto;
+    background:#fff;
     border:1px solid var(--border);
     border-radius:var(--radius);
     box-shadow:0 8px 28px rgba(0,0,0,.08);
@@ -40,63 +39,34 @@ body{
 }
 @keyframes fadeIn{from{opacity:0;transform:translateY(14px)}}
 
-.card-title{
+/* nagłówek */
+.card h2{
     margin:0 0 24px;
-    font:600 24px var(--font);
     text-align:center;
+    font:600 24px var(--font);
 }
 
-/* === formularz w dwóch kolumnach (jak w edycji) === */
-.task-form{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    column-gap:48px;
-}
-
-/* identyczne etykiety jak w taskDetails.css */
-.form-col label{
-    display:flex;
-    flex-direction:column;
-    gap:8px;
+/* ---------- formularze ---------- */
+.card form label{
+    display:block;
     font:600 1.35rem var(--font);
-    margin-bottom:24px;
+    margin-bottom:22px;
 }
-
-/* pola */
-input,select,textarea{
+.card input{
+    width:100%;
+    max-width:420px;
     font:400 14px var(--font);
     padding:10px 12px;
     border:1px solid var(--border);
     border-radius:8px;
 }
-input:focus,select:focus,textarea:focus{
+.card input:focus{
     outline:none;
     border-color:var(--acc);
     box-shadow:0 0 0 3px rgba(31,137,191,.18);
 }
 
-/* opis – bez zmiany rozmiaru */
-textarea{
-    resize:none;
-    min-height:220px;
-    max-height:220px;
-    overflow:auto;
-}
-textarea.error{
-    border-color:#d03c3c;
-    box-shadow:0 0 0 2px rgba(208,60,60,.35);
-}
-
-/* licznik znaków */
-.counter{
-    font:400 12px var(--font);
-    color:#666;
-    margin-top:4px;
-    align-self:flex-end;
-}
-.counter.over{color:#d03c3c}
-
-/* przyciski */
+/* ---------- przyciski ---------- */
 .btn-primary,.btn-secondary{
     font:600 14px var(--font);
     padding:10px 26px;
@@ -105,16 +75,37 @@ textarea.error{
     cursor:pointer;
     text-decoration:none;
     text-align:center;
+    display:inline-block;
 }
-.btn-primary{background:var(--acc);color:#fff;}
+.btn-primary{
+    background:var(--acc);
+    color:#fff;
+}
 .btn-primary:hover{background:#186d97;}
-.btn-secondary{background:#e5e7ea;color:#333;}
+.btn-secondary{
+    background:#e5e7ea;
+    color:#333;
+}
 .btn-secondary:hover{background:#d6dade;}
 
-.actions{
-    grid-column:1/-1;
-    display:flex;
-    gap:1rem;
-    justify-content:flex-end;
-    margin-top:6px;
+/* marginesy przy przyciskach */
+.card button,
+.card .btn-secondary{margin-top:4px}
+
+/* ---------- komunikaty ---------- */
+.err{
+    color:#d03c3c;
+    font:400 13px var(--font);
+    margin:6px 0 0;
+}
+.success{
+    color:#1aa55a;
+    font:400 14px var(--font);
+    margin:14px 0 0;
+}
+
+/* ---------- ogólne ---------- */
+input.error{
+    border-color:#d03c3c;
+    box-shadow:0 0 0 2px rgba(208,60,60,.35);
 }

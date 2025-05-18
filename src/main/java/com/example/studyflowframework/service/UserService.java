@@ -1,70 +1,112 @@
 package com.example.studyflowframework.service;
 
+import com.example.studyflowframework.config.RedisPublisher;
 import com.example.studyflowframework.model.User;
 import com.example.studyflowframework.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import java.util.List;
 
 /**
- * Serwis do obsługi użytkowników (zapisywanie, wyszukiwanie, zmiana hasła).
+ * Serwis do obsługi użytkowników:
+ *  • bieżący user, walidacja hasła
+ *  • zmiana hasła, zmiana maila
+ *  • publikacja kodów weryfikacyjnych (Redis)
+ *  • podstawowe CRUD-y
  */
 @Service
 public class UserService {
 
-    private final UserRepository userRepository;
+    private final UserRepository  repo;
+    private final PasswordEncoder encoder;
+    private final RedisPublisher  publisher;
 
+    /* --------------------------------------------------------
+       KONSTRUKTOR
+       -------------------------------------------------------- */
     @Autowired
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserService(UserRepository repo,
+                       PasswordEncoder encoder,
+                       RedisPublisher publisher) {
+        this.repo      = repo;
+        this.encoder   = encoder;
+        this.publisher = publisher;
     }
 
-    /**
-     * Znajdź usera po emailu. Jeśli nie istnieje, zwraca null.
-     */
+    /* --------------------------------------------------------
+       BIEŻĄCY UŻYTKOWNIK
+       -------------------------------------------------------- */
+    public User currentUser() {
+        String email = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
+        return repo.findByEmail(email).orElseThrow();   // 401 gdy brak
+    }
+
+    public boolean passwordMatches(User user, String rawPwd) {
+        return encoder.matches(rawPwd, user.getPassword());
+    }
+
+    /* --------------------------------------------------------
+       ZMIANA HASŁA / MAILA
+       -------------------------------------------------------- */
+    @Transactional
+    public void updatePassword(Long userId, String rawPwd) {
+        repo.updatePassword(userId, encoder.encode(rawPwd));
+    }
+
+    @Transactional
+    public void changeEmail(Long uid, String newEmail) {
+        User u = repo.findById(uid).orElseThrow();
+        u.setEmail(newEmail);
+        repo.save(u);
+    }
+
+    /* --------------------------------------------------------
+       PUBLIKACJA KODÓW (Redis → e-mail)
+       -------------------------------------------------------- */
+    /** Kod MFA / rejestracja – stary wariant (email|code). */
+    public void publishEmailVerification(String email, String code) {
+        publisher.publishUserRegistration(email + "|" + code);
+    }
+
+    /** Kod do zmiany adresu (emailChange|email|code). */
+    public void publishEmailChange(String email, String code) {
+        publisher.publishUserRegistration("emailChange|" + email + "|" + code);
+    }
+
+    /* --------------------------------------------------------
+       POZOSTAŁE OPERACJE
+       -------------------------------------------------------- */
     public User findByEmail(String email) {
-        Optional<User> opt = userRepository.findByEmail(email);
-        return opt.orElse(null);
+        return repo.findByEmail(email).orElse(null);
     }
 
-    /**
-     * (Opcjonalna) metoda, która rzuca Exception, jeśli nie ma usera
-     * - jeśli jej potrzebujesz, zostaw. Na razie można skasować lub zostawić.
-     */
     public User getUserByEmailOrThrow(String email) throws Exception {
-        Optional<User> opt = userRepository.findByEmail(email);
-        if (opt.isEmpty()) {
-            throw new Exception("NoMatchingRecordException: user not found for email " + email);
-        }
-        return opt.get();
+        return repo.findByEmail(email)
+                .orElseThrow(() -> new Exception(
+                        "user not found for email " + email));
     }
 
     @Transactional
     public void saveUser(User user) {
-        userRepository.save(user);
-    }
-
-    /**
-     * Zmiana hasła w bazie. Nie robimy żadnego encode tutaj,
-     * bo to zależy od użycia encoderów w SecurityConfig (o ile to się robi niżej).
-     */
-    @Transactional
-    public void updatePassword(Long userId, String newPassword) {
-        userRepository.updatePassword(userId, newPassword);
+        repo.save(user);
     }
 
     public boolean ifContainsEmail(String email) {
-        return userRepository.existsByEmail(email);
+        return repo.existsByEmail(email);
     }
 
     @Transactional
     public void deleteUser(Long id) {
-        userRepository.deleteById(id);
+        repo.deleteById(id);
     }
 
-    public java.util.List<User> getAllUsers() {
-        return userRepository.findAll();
+    public List<User> getAllUsers() {
+        return repo.findAll();
     }
 }

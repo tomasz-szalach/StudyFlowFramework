@@ -1,64 +1,60 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="pl" xmlns:th="https://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
-    <meta name="description" content="Zarejestruj się na StudyFlow">
-    <meta name="keywords" content="rejestracja, konto, StudyFlow">
-    <title>StudyFlow - Rejestracja</title>
+    <title>Rejestracja – StudyFlow</title>
 
-    <link rel="stylesheet" th:href="@{/css/styleRegistration.css}" />
-    <script th:src="@{/js/togglePassword.js}" defer></script>
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+    <script defer th:src="@{/js/register.js}"></script>
 </head>
 <body>
-<div id="Page_topbar">
-    <img class="Logo-small" th:src="@{/img/logo.svg}" alt="StudyFlow Logo">
-</div>
 
-<div id="container">
-    <div id="root">
-        <div class="PageContainer">
-            <section class="Registration-section">
-                <section class="ContainerBox">
-                    <h1 class="SignUp-Title">Zarejestruj się</h1>
+<div id="TopBar"><img class="logo" th:src="@{/img/logo.svg}" alt="logo"></div>
 
-                    <form class="SignUp-form" th:action="@{/registrationUser}" method="POST">
-                        <!-- messages -->
-                        <div class="messages" th:if="${messages}">
-                            <p th:each="msg : ${messages}" th:text="${msg}"></p>
-                        </div>
+<div class="card-wrap">
+    <h2 class="card-title">Załóż konto</h2>
 
-                        <div class="Input-container">
-                            <input class="Input_input" type="text" name="email" placeholder="E-mail" required>
-                        </div>
+    <form id="regForm" class="auth-form"
+          th:action="@{/registrationUser}" method="post">
 
-                        <div class="Input-container">
-                            <input class="Input_input Input_input_password"
-                                   type="password" name="password" placeholder="Hasło" required>
-                        </div>
-
-                        <div class="Input-container">
-                            <input class="Input_input Input_input_password"
-                                   type="password" name="password2" placeholder="Powtórz hasło" required>
-                        </div>
-
-                        <label class="SignUp-checkBox">
-                            <input type="checkbox" onchange="togglePassword(this)">
-                            <em>Pokaż hasło</em>
-                        </label>
-
-                        <div class="SignUp-formOptions">
-                            <button class="ButtonSignUp" type="submit">Zarejestruj się</button>
-                            <div class="SignUp-optionlink">
-                                <a th:href="@{/login}">Zaloguj się</a>
-                            </div>
-                        </div>
-                    </form>
-                </section>
-
-                <img class="Login-logo" th:src="@{/img/logo.svg}" alt="StudyFlow Logo">
-            </section>
+        <div class="field">
+            <label>E-mail</label>
+            <input type="email" name="email" required>
         </div>
-    </div>
+
+        <div class="field">
+            <label>Hasło</label>
+
+            <div class="pwd-inner">
+                <input type="password" id="regPwd1" name="password" required>
+                <button type="button" class="toggle eye">👁</button>
+            </div>
+
+            <div id="pwdStrength" class="strength"></div>
+        </div>
+
+        <div class="field">
+            <label>Powtórz hasło</label>
+
+            <div class="pwd-inner">
+                <input type="password" id="regPwd2" name="password2" required>
+                <button type="button" class="toggle eye">👁</button>
+            </div>
+
+            <div id="errSame" class="error-msg" style="display:none">
+                Hasła nie są takie same.
+            </div>
+        </div>
+
+        <button class="btn-primary">Zarejestruj</button>
+
+        <p th:if="${error}"   class="error-msg"   th:text="${error}"></p>
+        <p th:if="${success}" class="success-msg" th:text="${success}"></p>
+    </form>
+
+    <p class="note">Masz już konto?
+        <a th:href="@{/login}">Zaloguj się</a></p>
 </div>
+
 </body>
 </html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>Moje konto – StudyFlow</title>
+
+    <!-- główne style aplikacji + styles dla konta -->
+    <link rel="stylesheet" th:href="@{/css/stylehomePage.css}">
+    <link rel="stylesheet" th:href="@{/css/account.css}">
+</head>
+<body>
+
+<!-- TopBar z logo -->
+<div id="TopBar">
+    <img class="logo" th:src="@{/img/logo.svg}" alt="logo">
+</div>
+
+<!-- karta konta -->
+<div class="acc-card">
+    <h2>Moje konto</h2>
+
+    <div class="grid">
+        <!-- wiersz: e-mail + link do zmiany -->
+        <div>
+            <span class="label">Email</span>
+            <span th:text="${user.email}">email@example.com</span>
+
+            <!-- link (działa z th:href) -->
+            <a class="link-btn"
+               th:href="@{/account/change-email}">
+                Zmień e-mail
+            </a>
+        </div>
+
+        <!-- wiersz: hasło -->
+        <div>
+            <span class="label">Hasło</span>
+            <a class="link-btn" th:href="@{/changePassword}">Zmień hasło</a>
+        </div>
+
+        <!-- dołączył -->
+        <div>
+            <span class="label">Dołączył(a)</span>
+            <span th:text="${#temporals.format(user.createdAt, 'dd.MM.yyyy')}">–</span>
+        </div>
+
+        <!-- statystyki -->
+        <div>
+            <span class="label">Wszystkie zadania</span>
+            <span th:text="${total}">0</span>
+        </div>
+
+        <div>
+            <span class="label">Ukończone zadania</span>
+            <span th:text="${done}">0</span>
+        </div>
+    </div>
+
+    <!-- powrót -->
+    <a class="btn-back" th:href="@{/home}">↩ Powrót</a>
+</div>
+
+</body>
+</html>

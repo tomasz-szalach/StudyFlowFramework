@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>Zmień e-mail – StudyFlow</title>
+    <link rel="stylesheet" th:href="@{/css/changeEmail.css}">
+</head>
+<body>
+
+<div id="TopBar"><img class="logo" th:src="@{/img/logo.svg}" alt="logo"></div>
+
+<div class="card">
+    <h2>Zmień adres e-mail</h2>
+
+    <!-- krok 1 -->
+    <form th:if="${step == null}" th:action="@{/account/change-email}" method="post">
+        <label>Nowy e-mail
+            <input type="email" name="newEmail" required>
+        </label>
+        <button class="btn-primary">Wyślij kod</button>
+        <p class="err" th:text="${error}"></p>
+    </form>
+
+    <!-- krok 2 -->
+    <form th:if="${step == 2}" th:action="@{/account/change-email/verify}" method="post">
+        <label>Wpisz kod wysłany na <b th:text="${newEmail}"></b>
+            <input type="text" name="code" maxlength="6" required>
+        </label>
+        <button class="btn-primary">Potwierdź</button>
+        <p class="err" th:text="${error}"></p>
+    </form>
+
+    <p class="success" th:text="${success}"></p>
+    <a class="btn-secondary" th:href="@{/account}">↩ Powrót</a>
+</div>
+
+</body>
+</html>
