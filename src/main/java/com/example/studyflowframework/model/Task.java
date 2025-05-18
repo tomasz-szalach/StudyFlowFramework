@@ -11,6 +11,14 @@ import jakarta.persistence.*;
 @Schema(description = "Model reprezentujący zadanie")
 public class Task {
 
+    /* ---------- PRIORYTET ---------- */
+    public enum Priority {
+        @Schema(description = "Priorytet niski")   LOW,
+        @Schema(description = "Priorytet średni") MEDIUM,
+        @Schema(description = "Priorytet wysoki") HIGH
+    }
+
+    /* ---------- POLA ---------- */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Schema(description = "Unikalny identyfikator zadania", example = "1")
@@ -25,82 +33,60 @@ public class Task {
     @Schema(description = "Data wykonania zadania", example = "2025-02-15")
     private String dueDate;
 
+    /** `todo` | `completed` */
     @Schema(description = "Status zadania", example = "todo")
-    private String status;
+    private String status = "todo";
 
-    @Schema(description = "ID użytkownika, do którego należy zadanie", example = "1")
+    @Schema(description = "ID użytkownika", example = "1")
     private Long userId;
 
-    @Schema(description = "ID listy zadań, do której należy zadanie", example = "2")
+    @Schema(description = "ID listy zadań", example = "2")
     private Long taskListId;
 
-    public Task() {
-    }
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Schema(description = "Priorytet zadania", example = "LOW")
+    private Priority priority = Priority.LOW;     // ⇦ domyślnie „niski”
 
-    public Task(String name, String description, String dueDate, String status, Long userId, Long taskListId) {
-        this.name = name;
+    /* ---------- Konstruktory ---------- */
+    public Task() {}
+
+    public Task(String name, String description, String dueDate,
+                String status, Long userId, Long taskListId,
+                Priority priority) {
+        this.name        = name;
         this.description = description;
-        this.dueDate = dueDate;
-        this.status = status;
-        this.userId = userId;
-        this.taskListId = taskListId;
+        this.dueDate     = dueDate;
+        this.status      = status;
+        this.userId      = userId;
+        this.taskListId  = taskListId;
+        this.priority    = priority == null ? Priority.LOW : priority;
     }
 
-    // Gettery i Settery
-
-    public Long getId() {
-        return id;
+    /* stary konstruktor – zostawiony dla kompatybilności */
+    public Task(String name, String description, String dueDate,
+                String status, Long userId, Long taskListId) {
+        this(name, description, dueDate, status, userId, taskListId, Priority.LOW);
     }
 
-    public String getName() {
-        return name;
-    }
+    /* ---------- Gettery / Settery ---------- */
+    public Long      getId()          { return id; }
+    public String    getName()        { return name; }
+    public String    getDescription() { return description; }
+    public String    getDueDate()     { return dueDate; }
+    public String    getStatus()      { return status; }
+    public Long      getUserId()      { return userId; }
+    public Long      getTaskListId()  { return taskListId; }
+    public Priority  getPriority()    { return priority; }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public String getDueDate() {
-        return dueDate;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public Long getTaskListId() {
-        return taskListId;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setDueDate(String dueDate) {
-        this.dueDate = dueDate;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public void setTaskListId(Long taskListId) {
-        this.taskListId = taskListId;
+    public void setId(Long id)                  { this.id = id; }
+    public void setName(String name)            { this.name = name; }
+    public void setDescription(String d)        { this.description = d; }
+    public void setDueDate(String dueDate)      { this.dueDate = dueDate; }
+    public void setStatus(String status)        { this.status = status; }
+    public void setUserId(Long userId)          { this.userId = userId; }
+    public void setTaskListId(Long taskListId)  { this.taskListId = taskListId; }
+    public void setPriority(Priority priority)  {
+        this.priority = priority == null ? Priority.LOW : priority;
     }
 }

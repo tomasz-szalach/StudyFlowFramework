@@ -1,61 +1,72 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
     <meta name="description" content="Add new task">
     <meta name="keywords" content="tasks, add, new">
-    <title>StudyFlow - Add Task</title>
+    <title>StudyFlow – nowe zadanie</title>
 
-    <!-- Poprawiona ścieżka do CSS -->
     <link rel="stylesheet" th:href="@{/css/styleAddTaskPage.css}" />
+    <!-- ✨ Choices.js – CSS + JS -->
+    <link  href="https://cdn.jsdelivr.net/npm/choices.js@10.4.0/public/assets/styles/choices.min.css" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js@10.4.0/public/assets/scripts/choices.min.js" defer></script>
+
 </head>
 <body>
+<!-- top-bar (spójny z resztą aplikacji) -->
 <div id="TopBar">
     <img class="logo" th:src="@{/img/logo.svg}" alt="Logo">
 </div>
 
 <div id="container-page">
     <main class="main-content">
-        <div class="Page-Title-Bar">
-            <span>Utwórz nowe zadanie</span>
-        </div>
+        <div class="form-card">
+            <h2 class="card-title">Utwórz nowe zadanie</h2>
 
-        <section class="add-task">
-            <form th:action="@{/addTask}" method="POST">
+            <form th:action="@{/addTask}" method="POST" class="task-form">
 
-                <label for="task-name">Wpisz nazwę nowego zadania</label>
-                <input id="task-name" type="text" name="name" placeholder="Nazwa zadania" required />
+                <!-- nazwa -->
+                <label for="task-name">Nazwa zadania</label>
+                <input id="task-name" type="text" name="name"
+                       placeholder="np. Projekt z algorytmów"
+                       required />
 
-                <label for="task-desc">Wpisz opis zadania</label>
-                <textarea id="task-desc" name="description" placeholder="Opis zadania"></textarea>
+                <!-- opis -->
+                <label for="task-desc">Opis</label>
+                <textarea id="task-desc" name="description"
+                          placeholder="Kilka słów o zadaniu…" rows="3"></textarea>
 
-                <label for="task-date">Wybierz datę zakończenia zadania</label>
+                <!-- data -->
+                <label for="task-date">Termin wykonania</label>
                 <input id="task-date" type="date" name="due_date" required />
 
-                <label for="task-list">Wybierz listę zadań</label>
-                <select id="task-list" name="task_list_id" required>
-
+                <!-- lista zadań -->
+                <label for="task-list">Lista zadań</label>
+                <select id="task-list" name="task_list_id" data-choices required>
                     <option th:each="taskList : ${taskLists}"
                             th:value="${taskList.id}"
                             th:text="${taskList.name}">
-                        Lista
                     </option>
                 </select>
 
+                <!-- priorytet -->
+                <label for="priority">Priorytet</label>
+                <select id="priority" name="priority" data-choices>
+                    <option value="low" selected>NISKI</option>
+                    <option value="medium">ŚREDNI</option>
+                    <option value="high">WYSOKI</option>
+                </select>
+
+                <!-- przyciski -->
                 <div class="buttons">
-                    <button type="submit" class="add-button">Dodaj zadanie</button>
+                    <button type="submit" class="add-button">Dodaj</button>
                     <a th:href="@{/home}" class="cancel-button">Anuluj</a>
                 </div>
             </form>
-        </section>
+        </div>
     </main>
 </div>
+<script src="/js/addTaskPage-anim.js" defer></script>
 
-<footer>
-    <p>&copy; 2024 StudyFlow</p>
-</footer>
-
-<!-- Ścieżka do JS -->
-<script th:src="@{/js/logout.js}" defer></script>
 </body>
 </html>

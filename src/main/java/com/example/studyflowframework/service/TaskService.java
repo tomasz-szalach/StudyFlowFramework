@@ -22,9 +22,13 @@ public class TaskService {
     }
 
     @Transactional
-    public String addTask(String name, String description, String dueDate, String status,
-                          Long taskListId, Long userId) {
-        Task task = new Task(name, description, dueDate, status, userId, taskListId);
+    public String addTask(String name, String description, String dueDate,
+                          String status, Long taskListId, Long userId,
+                          Task.Priority priority) {
+
+        Task task = new Task(name, description, dueDate,
+                status, userId, taskListId, priority);
+
         taskRepository.save(task);
         return "Zadanie zostało dodane pomyślnie.";
     }

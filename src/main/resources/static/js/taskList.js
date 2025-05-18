@@ -30,6 +30,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    function priorityLabel(p){
+        const pri = (p||'low').toLowerCase();          // domyślnie niski
+        if(pri==='high')   return {cls:'priority-high', txt:'WYSOKI'};
+        if(pri==='medium' || pri==='mid')
+            return {cls:'priority-mid',  txt:'ŚREDNI'};
+        return             {cls:'priority-low',  txt:'NISKI'};
+    }
+
+
     /* === uniwersalne okno „Czy na pewno?” === */
     function showConfirm(title, msg, confirmTxt = 'Usuń') {
         return new Promise(resolve => {
@@ -108,40 +117,60 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /* ----- poj. kartka ----- */
-    function createTaskItem(t,done){
-        const tpl=document.querySelector('#task-template').content.cloneNode(true);
-        const item=tpl.querySelector('.task-item');
-        item.dataset.taskId=t.id;
-        if(done) item.classList.add('completed');
+    function createTaskItem(t, done) {
+        const tpl  = document.querySelector('#task-template').content.cloneNode(true);
+        const item = tpl.querySelector('.task-item');
+        item.dataset.taskId = t.id;
+        if (done) item.classList.add('completed');
 
-        const name=tpl.querySelector('.name'); name.textContent=t.name;
-        if(done) name.classList.add('completed');
+        const name = tpl.querySelector('.name');
+        name.textContent = t.name;
+        if (done) name.classList.add('completed');
 
-        const due=t.due_date||t.dueDate;
-        const dueDiv=tpl.querySelector('.due-date');
-        if(due){ dueDiv.textContent=`Termin wykonania zadania: ${due}`; dueDiv.dataset.raw=due; }
+        const due = t.due_date || t.dueDate;
+        const dueDiv = tpl.querySelector('.due-date');
+        if (due) {
+            dueDiv.textContent = `Termin wykonania zadania: ${due}`;
+            dueDiv.dataset.raw = due;
+        }
 
-        const box=document.createElement('div'); box.className='status-box';
-        const st =document.createElement('div'); st.className='status';
-        st.textContent=done?'Zakończone':'Do zrobienia'; box.append(st);
-        const info=deadlineLabel(due);
-        if(info && !done){
-            const badge=document.createElement('span');
-            badge.className=`deadline-info ${info.cls}`; badge.textContent=info.txt;
+        /* status-box */
+        const box = document.createElement('div'); box.className = 'status-box';
+        const st  = document.createElement('div'); st.className  = 'status';
+        st.textContent = done ? 'Zakończone' : 'Do zrobienia';
+        box.append(st);
+
+        /* deadline */
+        const info = deadlineLabel(due);
+        if (info && !done) {
+            const badge = document.createElement('span');
+            badge.className = `deadline-info ${info.cls}`;
+            badge.textContent = info.txt;
             box.append(badge);
         }
 
-        const header=tpl.querySelector('.task-header');
+        /* ► pri badge */
+        const pri = priorityLabel(t.priority);               // NEW
+        const p   = document.createElement('span');          // NEW
+        p.className   = `priority-info ${pri.cls}`;          // NEW
+        p.textContent = pri.txt;                             // NEW
+        box.append(p);                                       // NEW
+
+        /* osadź w headerze */
+        const header = tpl.querySelector('.task-header');
         header.insertBefore(box, header.querySelector('.delete-task-button'));
 
-        const cb=tpl.querySelector('.task-checkbox');
-        cb.checked=done; cb.addEventListener('change',()=>toggleStatus(item));
+        /* events */
+        const cb = tpl.querySelector('.task-checkbox');
+        cb.checked = done;
+        cb.addEventListener('change', () => toggleStatus(item));
 
         tpl.querySelector('.delete-task-button')
-            .addEventListener('click',()=>deleteTask(t.id,item));
+            .addEventListener('click', () => deleteTask(t.id, item));
 
         return tpl;
     }
+
 
     /* ----- toggle ----- */
     async function toggleStatus(item){

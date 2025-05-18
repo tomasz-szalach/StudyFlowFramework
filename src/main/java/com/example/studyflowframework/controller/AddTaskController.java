@@ -1,5 +1,6 @@
 package com.example.studyflowframework.controller;
 
+import com.example.studyflowframework.model.Task;
 import com.example.studyflowframework.model.TaskList;
 import com.example.studyflowframework.model.User;
 import com.example.studyflowframework.service.TaskListService;
@@ -77,26 +78,25 @@ public class AddTaskController {
             @ApiResponse(responseCode = "404", description = "Nieznaleziony użytkownik")
     })
     @PostMapping("/addTask")
-    public String addTask(
-            @RequestParam String name,
-            @RequestParam String description,
-            @RequestParam String due_date,
-            @RequestParam Long task_list_id
-    ) {
-        // 1. Email
+    public String addTask(@RequestParam String name,
+                          @RequestParam String description,
+                          @RequestParam String due_date,
+                          @RequestParam Long   task_list_id,
+                          @RequestParam(name="priority", defaultValue = "low") String prio) {
+
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        // 2. userId
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
-        Long userId = user.getId();
 
-        // 3. Zakładamy status domyślny "todo"
-        String status = "todo";
-
-        // 4. Zapis
-        taskService.addTask(name, description, due_date, status, task_list_id, userId);
-
-        // 5. redirect
+        taskService.addTask(
+                name,
+                description,
+                due_date,
+                "todo",
+                task_list_id,
+                user.getId(),
+                Task.Priority.valueOf(prio.toUpperCase())        // LOW | MEDIUM | HIGH
+        );
         return "redirect:/home";
     }
 }

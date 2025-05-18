@@ -2,100 +2,96 @@
 <html lang="pl" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
-    <meta name="description" content="Manage your tasks">
-    <meta name="keywords" content="tasks, todo, list">
     <title>StudyFlow</title>
 
     <link rel="stylesheet" th:href="@{/css/stylehomePage.css}"/>
-    <script th:src="@{/js/logout.js}"        defer></script>
-    <script th:src="@{/js/search.js}"        defer></script>
+    <script th:src="@{/js/logout.js}" defer></script>
+    <script th:src="@{/js/search.js}" defer></script>
     <script th:src="@{/js/changePassword.js}" defer></script>
-    <script src="/js/homepage.js"             defer></script>
+    <script src="/js/homepage.js" defer></script>
 </head>
 <body>
-<!-- ░░─ GŁÓWNY TOPBAR ─░░ -->
+
+<!-- ░ top-bar ░ -->
 <div id="TopBar">
     <img class="logo" th:src="@{/img/logo.svg}" alt="Logo">
     <div id="User-profile">
-        <div class="User-profile2" onclick="logout(this)">
-            <span class="Logout">Wyloguj się</span>
-        </div>
-        <a class="User-profile2" th:href="@{/changePassword}">
-            <span class="ChangePassword">Zmień hasło</span>
-        </a>
+        <div class="User-profile2" onclick="logout(this)"><span class="Logout">Wyloguj się</span></div>
+        <a class="User-profile2" th:href="@{/changePassword}"><span class="ChangePassword">Zmień hasło</span></a>
     </div>
 </div>
 
-<!-- ░░─ LAYOUT ─░░ -->
 <div id="container-page">
-    <!-- ≡≡ SIDEBAR ≡≡ -->
+
+    <!-- ░ sidebar ░ -->
     <aside class="sidebar">
         <div class="tasklist-display">
             <h3>Twoje listy zadań</h3>
 
-            <!-- listy zadań -->
             <div th:if="${taskLists != null}">
                 <div th:each="taskList,iter:${taskLists}">
                     <div class="home-blocks">
-                        <!-- link wybierający listę -->
                         <a class="TASKLIST"
                            th:classappend="${iter.index}==0 ? ' selected' : ''"
-                           href="#"
-                           th:attr="data-tasklist-id=${taskList.id}">
+                           th:attr="data-tasklist-id=${taskList.id}" href="#">
                             <div class="TASKLIST-choose">
                                 <span class="tasklist-icon">&#x1F4CB;</span>
-                                <div class="name"
-                                     th:text="${taskList.name}">Nazwa listy</div>
+                                <div class="name" th:text="${taskList.name}">Nazwa listy</div>
                             </div>
-                            <!-- przycisk menu kontekstowego -->
-                            <button class="list-menu-btn"
-                                    type="button"
-                                    title="Opcje"
-                                    th:attr="data-id=${taskList.id}">⋮</button>
+                            <button class="list-menu-btn" th:attr="data-id=${taskList.id}">⋮</button>
                         </a>
                     </div>
                 </div>
             </div>
 
-            <a class="add-tasklist" th:href="@{/addTaskList}">
-                Dodaj nową listę zadań
-            </a>
+            <a class="add-tasklist" th:href="@{/addTaskList}">Dodaj nową listę zadań</a>
         </div>
     </aside>
 
-    <!-- ≡≡ MAIN ≡≡ -->
+    <!-- ░ main ░ -->
     <main class="main-content">
-        <!-- gdy istnieją listy -->
+
         <div th:if="${taskLists != null and !taskLists.isEmpty()}">
+
             <div class="Page-Title-Bar">
-                <span class="page-title">
-                    Zadania <span th:text="${activeListName}">Domyślna lista</span>
-                </span>
+                <span class="page-title">Zadania <span th:text="${activeListName}">Domyślna lista</span></span>
             </div>
 
             <div class="search-bar">
-                <input id="search" placeholder="Znajdź zadanie"/>
+                <input id="search" placeholder="Znajdź zadanie">
                 <span class="search-icon">&#128269;</span>
             </div>
 
-            <div class="create-task-container">
-                <a class="create-task-button" th:href="@{/addTaskPage}">
-                    Utwórz nowe zadanie
-                </a>
+            <!-- przycisk + sort -->
+            <div class="toolbar">
+                <div class="create-task-container">
+                    <a class="create-task-button" th:href="@{/addTaskPage}">Utwórz nowe zadanie</a>
+                </div>
+
+                <div class="sort-wrapper">
+                    <button type="button" class="sort-btn" title="Sortowanie">
+                        <span class="sort-label">Sortuj ↑↓</span>
+                        <span class="sort-dir" style="display:none">▲</span><!-- dla JS -->
+                    </button>
+
+                    <div class="sort-menu">
+                        <button data-field="due">Termin wykonania</button>
+                        <button data-field="priority">Priorytet</button>
+                        <button data-field="created">Data utworzenia</button>
+                        <button data-field="alpha">Alfabetycznie</button>
+                    </div>
+                </div>
             </div>
+
+            <div class="sort-info"></div>
 
             <section class="task-display"></section>
         </div>
 
-        <!-- gdy nie ma jeszcze żadnych list -->
-        <div th:unless="${taskLists != null and !taskLists.isEmpty()}"
-             class="empty-state">
+        <div th:unless="${taskLists != null and !taskLists.isEmpty()}" class="empty-state">
             <h2>Witaj w StudyFlow</h2>
             <p>Nie masz jeszcze żadnych list zadań.</p>
-            <p>Aby rozpocząć, utwórz swoją pierwszą listę zadań.</p>
-            <a class="add-tasklist-button" th:href="@{/addTaskList}">
-                Dodaj nową listę
-            </a>
+            <a class="add-tasklist-button" th:href="@{/addTaskList}">Dodaj nową listę</a>
         </div>
     </main>
 </div>
@@ -114,6 +110,5 @@
     </div>
 </template>
 
-<footer><p>&copy; 2024 StudyFlow</p></footer>
 </body>
 </html>

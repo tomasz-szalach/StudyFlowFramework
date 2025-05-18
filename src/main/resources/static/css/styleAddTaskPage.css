@@ -1,167 +1,187 @@
+/* ============== ogólne zmienne i reset (jak w homepage) ============== */
 @import url(https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap);
 
-:root {
-    --app-bg-color: #f0f2f5;
-    --app-bg-color-lighter: #ffffff;
-    --app-bg-color-darker: #e6e7e8;
-    --app-font-color: #303035;
-    --app-font-family: "Quicksand", sans-serif;
-    --app-acc-color: #1f89bf;
-    color: var(--app-font-color);
-    font-family: var(--app-font-family);
-    font-size: 10px;
-    font-weight: 400;
-    background-color: var(--app-bg-color);
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+:root{
+    --app-bg-color:#f0f2f5;
+    --app-bg-color-lighter:#ffffff;
+    --app-bg-color-darker:#e6e7e8;
+    --app-font-color:#303035;
+    --app-font-family:"Quicksand",sans-serif;
+    --app-acc-color:#1f89bf;
+
+    --radius:.8rem;
 }
 
-a,
-a:visited {
-    outline: none;
-    text-decoration: inherit;
+*,*:before,*:after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font:400 10px var(--app-font-family);color:var(--app-font-color);background:var(--app-bg-color);}
+
+/* ============== top-bar ============== */
+#TopBar{
+    display:flex;align-items:center;justify-content:center;
+    height:60px;background:var(--app-bg-color-darker);
+}
+.logo{height:38px}
+
+/* ============== layout ============== */
+#container-page{
+    display:flex;align-items:center;justify-content:center;
+    height:calc(100% - 60px);padding:2rem;
 }
 
-a,
-a:visited {
-    color: inherit;
+/* ============== karta formularza ============== */
+.form-card{
+    width:min(100%,460px);
+    background:#fff;border-radius:1.2rem;
+    box-shadow:0 10px 25px rgba(0,0,0,.13);
+    padding:3rem 3.4rem;display:flex;flex-direction:column;gap:2rem;
+    animation:fadeIn .4s cubic-bezier(.25,.8,.25,1);
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(1rem)}}
+.card-title{margin:0;text-align:center;font-size:2.4rem;font-weight:600;}
+
+/* ============== formularz ============== */
+.task-form{display:flex;flex-direction:column;gap:1.8rem;font-size:1.4rem;}
+.task-form label{font-weight:600;font-size:1.3rem;margin-bottom:.3rem;}
+
+.task-form input[type=text],
+.task-form input[type=date],
+.task-form textarea,
+.task-form select{
+    width:100%;padding:.9rem 1.1rem 1rem;          /* ciut większy padding dolny */
+    font-size:1.4rem;
+    border:1px solid #cfd4d9;
+    border-radius:var(--radius);
+    background:#fff;
+    transition:border .22s,box-shadow .22s;
+}
+.task-form textarea{resize:vertical;min-height:80px;}
+
+.task-form input:focus,
+.task-form textarea:focus,
+.task-form select:focus{
+    outline:none;border-color:var(--app-acc-color);
+    box-shadow:0 0 0 3px rgba(31,137,191,.20);
 }
 
-button {
-    border: none;
-    color: var(--app-font-color);
-    font-family: var(--app-font-family);
-    outline: none;
+/* ============== custom <select> ============== */
+.task-form select{
+    appearance:none;-moz-appearance:none;-webkit-appearance:none;
+    background:
+            linear-gradient(#fff,#fff) padding-box,
+            url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3e%3cpath d='M2 2l4 4 4-4' fill='none' stroke='%23303035' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3e%3c/svg%3e")
+            no-repeat right 1.1rem center/1.1rem .7rem;
+    cursor:pointer;
+}
+.task-form select.open{
+    background-image:
+            linear-gradient(#fff,#fff),
+            url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3e%3cpath d='M2 6l4-4 4 4' fill='none' stroke='%231f89bf' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3e%3c/svg%3e");
+    transform:scale(1.012);
 }
 
-html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    overflow: hidden;
+/* Firefox nie pozwala na full-custom arrow, ale reszta stylu działa */
+
+/* ============== date-picker (WebKit) ============== */
+input[type=date]::-webkit-calendar-picker-indicator{
+    opacity:0;                   /* ukryj natywną ikonę */
+    cursor:pointer;
+}
+input[type=date]{
+    position:relative;
+}
+input[type=date]::after{         /* własna ikonka kalendarza */
+    content:'📅';
+    position:absolute;right:.9rem;top:50%;
+    transform:translateY(-50%);
+    pointer-events:none;
+    font-size:1.6rem;
 }
 
-#TopBar {
-    flex-shrink: 0;
-    justify-content: space-between;
-    padding: 1rem 2rem;
-    align-items: center;
-    box-sizing: border-box;
-    display: flex;
-    width: 100%;
-    background-color: var(--app-bg-color-darker);
+/* ============== przyciski ============== */
+.buttons{display:flex;gap:1.2rem;justify-content:flex-end;margin-top:.4rem;}
+.add-button,.cancel-button{
+    flex:0 0 auto;padding:.9rem 2.2rem;border:none;border-radius:var(--radius);
+    font-size:1.4rem;font-weight:600;cursor:pointer;text-decoration:none;
+    transition:background .25s ease;
+}
+.add-button{background:var(--app-acc-color);color:#fff;}
+.add-button:hover{background:#186d97;}
+
+.cancel-button{background:#e3e6e9;color:#333;text-align:center;line-height:1.4rem;}
+.cancel-button:hover{background:#cfd4d9;}
+
+/* ---------- poprawki strzałki & padding ---------- */
+.task-form select{
+    padding-right:3.4rem;                 /* więcej miejsca na strzałkę */
+    transition:border .22s,box-shadow .22s,transform .18s;
+}
+.task-form select.open{
+    border-color:var(--app-acc-color);     /* wyraźniejszy border gdy lista otwarta */
+    transform:scale(1.01);                 /* lekki „podskok” */
 }
 
-.logo {
-    height: 4rem;
+/* ↓ ukryj (Edge/IE) defaultową strzałkę – gdybyś testował w tych przeglądarkach */
+select::-ms-expand{display:none;}
+
+/* ====== Choices.js – personalizacja ====== */
+
+/* kontener ─ cień + radius zgodny z kartą */
+.myChoices{
+    --radius:.8rem;
+}
+.myChoices .choices__inner{
+    border:1px solid #cfd4d9 !important;
+    border-radius:var(--radius);
+    padding:0.85rem 3.2rem 0.85rem 1.2rem;       /* miejsce na strzałkę */
+    font-size:1.4rem;
+    min-height:auto;
+    transition:border .2s,box-shadow .2s;
+}
+.myChoices.is-focused .choices__inner{
+    border-color:var(--app-acc-color) !important;
+    box-shadow:0 0 0 3px rgba(31,137,191,.20);
 }
 
-#User-profile {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
+/* strzałka */
+.myChoices .choices__inner::after{
+    content:'';
+    position:absolute;right:1.1rem;top:50%;width:.9rem;height:.55rem;
+    background:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3e%3cpath d='M2 2l4 4 4-4' fill='none' stroke='%23303035' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3e%3c/svg%3e") center/contain no-repeat;
+    transform:translateY(-50%) rotate(0);
+    transition:transform .25s ease;
+}
+.myChoices.is-open .choices__inner::after{
+    transform:translateY(-50%) rotate(180deg);
+    background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3e%3cpath d='M2 6l4-4 4 4' fill='none' stroke='%231f89bf' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3e%3c/svg%3e");
 }
 
-.User-profile2 {
-    align-items: center;
-    cursor: pointer;
-    display: flex;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
+/* lista opcji */
+.myChoices .choices__list--dropdown{
+    border:1px solid #d6dbe0 !important;
+    border-radius:var(--radius);
+    box-shadow:0 6px 22px rgba(0,0,0,.12);
+    animation:drop .18s cubic-bezier(.25,.8,.25,1);
+}
+@keyframes drop{from{opacity:0;transform:translateY(-8px)}}
+
+.myChoices .choices__item--selectable{
+    padding:.9rem 1.2rem;font-size:1.4rem;
+}
+.myChoices .choices__item--selectable.is-highlighted{
+    background:var(--app-bg-color);color:#000;
 }
 
-.Logout {
-    font-size: 1.5rem;
-    color: #000;
+/* ≡≡ Choices – ładniejszy hover / zaznaczenie ≡≡  */
+.myChoices .choices__item--selectable.is-highlighted,
+.myChoices .choices__item--selectable.is-selected{
+    background:#ecf4fa !important;   /* jasny „app-blue” */
+    color:var(--app-acc-color) !important;
+    font-weight:600;
+    transition:background .15s;
 }
 
-#container-page {
-    display: flex;
-    flex-direction: column;
-    height: calc(100vh - 6rem);
-    justify-content: center;
-    align-items: center;
-    margin-top: 0; /* Usuń marginesy */
-    padding-top: 0; /* Usuń padding */
+/* cień całej listy gdy otwarta */
+.myChoices.is-open .choices__list--dropdown{
+    box-shadow:0 12px 28px rgba(0,0,0,.18);
 }
 
-.main-content {
-    flex-grow: 1;
-    padding: 2rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100%; 
-    box-sizing: border-box;
-}
-
-.Page-Title-Bar {
-    text-align: center;
-    font-size: 2.5rem;
-    margin-bottom: 2rem;
-}
-
-.add-task form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    margin-bottom: 2rem;
-    width: 100%;
-    max-width: 500px; 
-}
-
-.add-task label {
-    font-size: 1rem; 
-    font-weight: 500;
-    color: var(--app-font-color);
-}
-
-.add-task input,
-.add-task textarea,
-.add-task select {
-    padding: 1rem;
-    border: 1px solid var(--app-bg-color-darker);
-    border-radius: 0.5rem;
-    outline: none;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.buttons {
-    display: flex;
-    gap: 1rem;
-}
-
-.add-button,
-.cancel-button {
-    background-color: var(--app-acc-color);
-    color: #fff;
-    cursor: pointer;
-    border: none;
-    padding: 1rem 2rem; /* Zmniejsz szerokość przycisku */
-    border-radius: 0.5rem;
-    text-align: center;
-    text-decoration: none;
-    flex: 1;
-    font-family: var(--app-font-family); /* Dodanie spójnej czcionki */
-    font-size: 1rem; /* Dopasowanie rozmiaru czcionki */
-    font-weight: 500; /* Dopasowanie grubości czcionki */
-}
-
-.cancel-button {
-    background-color: #f44336;
-}
-
-footer {
-    text-align: left;
-    padding: 0.3rem;
-    background-color: var(--app-bg-color-darker);
-    color: var(--app-font-color);
-    flex-shrink: 0;
-    width: 100%;
-    position: fixed;
-    bottom: 0;
-    font-size: 1rem;
-}
