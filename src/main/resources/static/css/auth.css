@@ -137,3 +137,9 @@ input.no-valid{
     font-weight:600;
 }
 .note a:hover{text-decoration:underline}
+
+.info-msg{
+    font:400 14px var(--font);
+    color:#555;
+    margin:-8px 0 22px;   /* –8 aby zmniejszyć przerwę nad pierwszym polem */
+}

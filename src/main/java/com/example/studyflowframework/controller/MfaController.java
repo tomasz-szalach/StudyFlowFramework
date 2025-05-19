@@ -14,47 +14,62 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/verify-mfa")
 public class MfaController {
 
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
-    /**
-     * Wyświetla formularz weryfikacji MFA (Multi-Factor Authentication).
-     *
-     * @return Widok verify-mfa.html
-     */
-    @GetMapping
-    public String showMfaForm() {
-        return "verify-mfa"; // verify-mfa.html w templates
+    @Autowired
+    public MfaController(RedisTemplate<String, Object> redisTemplate) {
+        this.redisTemplate = redisTemplate;
     }
 
-    /**
-     * Obsługuje sprawdzanie kodu MFA.
-     *
-     * @param mfaCode kod wpisany przez użytkownika
-     * @param session obiekt sesji
-     * @param model   model widoku
-     * @return Przekierowanie do /home lub ponowne wyświetlenie formularza z błędem
-     */
-    @PostMapping
-    public String verifyMfa(@RequestParam("mfaCode") String mfaCode,
-                            HttpSession session,
-                            Model model) {
-        String email = (String) session.getAttribute("mfa_email");
+    /* ---------- GET – formularz ---------- */
+    @GetMapping
+    public String form() {
+        return "verify-mfa";                 // templates/verify-mfa.html
+    }
 
+    /* ---------- POST – weryfikacja ---------- */
+    @PostMapping
+    public String verify(@RequestParam("code") String code,   // <── NAZWA = "code"
+                         HttpSession session,
+                         Model model) {
+
+        /* a) brak sesji = wracamy do logowania */
+        String email = (String) session.getAttribute("mfa_email");
         if (email == null) {
             return "redirect:/login";
         }
 
-        String key = "mfa:" + email;
+        /* b) pobierz oczekiwany kod z Redisa */
+        String key          = "mfa:" + email;
         String expectedCode = (String) redisTemplate.opsForValue().get(key);
 
-        if (expectedCode != null && expectedCode.equals(mfaCode)) {
-            session.setAttribute("mfa_verified", true);
-            redisTemplate.delete(key);
+        if (expectedCode != null && expectedCode.equals(code.trim())) {
+            /* ✓ kod poprawny */
+            session.setAttribute("mfa_verified", true);   // flaga dla filtra
+            redisTemplate.delete(key);                   // jednorazowy → usuń
             return "redirect:/home";
-        } else {
-            model.addAttribute("error", "Niepoprawny kod MFA");
-            return "verify-mfa";
         }
+
+        /* ✗ kod zły */
+        model.addAttribute("error", "Niepoprawny kod MFA.");
+        return "verify-mfa";
+    }
+
+    /* ---------- ponowne wysłanie kodu ---------- */
+    @GetMapping("/resend")
+    public String resendCode(HttpSession session, Model model){
+
+        String email = (String) session.getAttribute("mfa_email");
+        if (email == null) return "redirect:/login";
+
+        // wygeneruj nowy kod, zapisz w Redis (TTL 5 min) – pseudo-kod:
+        String code = String.format("%06d",(int)(Math.random()*1_000_000));
+        redisTemplate.opsForValue().set("mfa:"+email, code, java.time.Duration.ofMinutes(5));
+
+        // … tu wywołanie publishera, aby poszedł e-mail …
+        // publisher.publishUserRegistration(email + "|" + code);
+
+        model.addAttribute("success", "Nowy kod został wysłany.");
+        return "verify-mfa";
     }
 }

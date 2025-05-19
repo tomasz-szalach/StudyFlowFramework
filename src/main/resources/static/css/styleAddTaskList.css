@@ -1,23 +1,23 @@
-/* — Quicksand + paleta jak w taskDetails — */
+/* static/css/styleAddTaskList.css */
 @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap');
 
 :root{
-    --acc:#1f89bf;
-    --bg:#f0f2f5;
-    --bg-card:#fff;
-    --border:#dadde1;
-    --radius:1rem;
-    --font:'Quicksand',sans-serif;
+    --acc:#1f89bf; --bg:#f0f2f5; --border:#dadde1;
+    --radius:1rem; --font:'Quicksand',sans-serif;
 }
+
+*{box-sizing:border-box}
 
 body{
     margin:0;
     font:400 16px var(--font);
     background:var(--bg);
     color:#333;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
 }
 
-/* === TopBar === */
 #TopBar{
     height:58px;
     background:#e6e7e8;
@@ -27,11 +27,12 @@ body{
 }
 #TopBar .logo{height:36px}
 
-/* === karta + animacja === */
+/* karta */
 .card-wrap{
-    max-width:940px;
-    margin:24px auto 32px;
-    background:var(--bg-card);
+    width:100%;
+    max-width:460px;
+    margin:auto;
+    background:#fff;
     border:1px solid var(--border);
     border-radius:var(--radius);
     box-shadow:0 8px 28px rgba(0,0,0,.08);
@@ -41,60 +42,30 @@ body{
 @keyframes fadeIn{from{opacity:0;transform:translateY(14px)}}
 
 .card-title{
-    margin:0 0 24px;
-    font:600 24px var(--font);
     text-align:center;
+    font:600 24px var(--font);
+    margin:0 0 26px;
 }
 
-/* === formularz w dwóch kolumnach (jak w edycji) === */
-.task-form{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    column-gap:48px;
+/* formularz */
+.tasklist-form label{
+    display:block;
+    font:600 1.2rem var(--font);
+    margin-bottom:22px;
 }
 
-/* identyczne etykiety jak w taskDetails.css */
-.form-col label{
-    display:flex;
-    flex-direction:column;
-    gap:8px;
-    font:600 1.35rem var(--font);
-    margin-bottom:24px;
-}
-
-/* pola */
-input,select,textarea{
+.tasklist-form input{
+    width:100%;
     font:400 14px var(--font);
     padding:10px 12px;
     border:1px solid var(--border);
     border-radius:8px;
 }
-input:focus,select:focus,textarea:focus{
+.tasklist-form input:focus{
     outline:none;
     border-color:var(--acc);
     box-shadow:0 0 0 3px rgba(31,137,191,.18);
 }
-
-/* opis – bez zmiany rozmiaru */
-textarea{
-    resize:none;
-    min-height:220px;
-    max-height:220px;
-    overflow:auto;
-}
-textarea.error{
-    border-color:#d03c3c;
-    box-shadow:0 0 0 2px rgba(208,60,60,.35);
-}
-
-/* licznik znaków */
-.counter{
-    font:400 12px var(--font);
-    color:#666;
-    margin-top:4px;
-    align-self:flex-end;
-}
-.counter.over{color:#d03c3c}
 
 /* przyciski */
 .btn-primary,.btn-secondary{
@@ -112,9 +83,12 @@ textarea.error{
 .btn-secondary:hover{background:#d6dade;}
 
 .actions{
-    grid-column:1/-1;
     display:flex;
     gap:1rem;
     justify-content:flex-end;
     margin-top:6px;
 }
+
+/* komunikaty */
+.error-msg   {color:#d03c3c;font:400 12px var(--font);margin-top:12px;}
+.success-msg {color:#1da237;font:400 12px var(--font);margin-top:12px;}

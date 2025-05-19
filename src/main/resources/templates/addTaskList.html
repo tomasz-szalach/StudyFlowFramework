@@ -1,54 +1,41 @@
+<!-- templates/addTaskList.html -->
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
-    <meta name="description" content="Add a new task list">
-    <meta name="keywords" content="tasks, todo, list">
-    <title>StudyFlow - Add Task List</title>
+    <title>Nowa lista zadań – StudyFlow</title>
 
-    <link rel="stylesheet" th:href="@{/css/styleRegistration.css}" />
+    <link rel="stylesheet" th:href="@{/css/stylehomePage.css}">
+    <link rel="stylesheet" th:href="@{/css/styleAddTaskList.css}">
 </head>
 <body>
-<div id="Page_topbar">
-    <img class="Logo-small" th:src="@{/img/logo.svg}" alt="StudyFlow Logo">
+
+<!-- TopBar -->
+<div id="TopBar">
+    <img class="logo" th:src="@{/img/logo.svg}" alt="Logo">
 </div>
 
-<div id="container">
-    <div id="root">
-        <div class="PageContainer">
-            <section class="Registration-section">
-                <section class="ContainerBox">
-                    <h1 class="SignUp-Title">Dodaj nową listę zadań</h1>
+<!-- karta -->
+<div class="card-wrap">
+    <h2 class="card-title">Utwórz nową listę zadań</h2>
 
+    <form th:action="@{/addTaskList}" method="post" class="tasklist-form">
 
-                    <form class="SignUp-form" th:action="@{/createTaskList}" method="POST">
+        <label>Nazwa listy
+            <input name="name"
+                   placeholder="np. Projekty na uczelnię"
+                   maxlength="100" required>
+        </label>
 
-                        <div class="messages" th:if="${messages}">
-                            <p th:each="msg : ${messages}" th:text="${msg}"></p>
-                        </div>
-
-                        <div class="Input-container">
-                            <input class="Input_input"
-                                   type="text"
-                                   name="name"
-                                   placeholder="Nazwa listy zadań"
-                                   required />
-                        </div>
-
-                        <div class="SignUp-formOptions">
-                            <button class="ButtonSignUp" type="submit">
-                                Dodaj listę
-                            </button>
-                            <div class="SignUp-optionlink">
-                                <a th:href="@{/home}">Powrót</a>
-                            </div>
-                        </div>
-                    </form>
-                </section>
-                <img class="Login-logo" th:src="@{/img/logo.svg}" alt="StudyFlow Logo">
-            </section>
+        <div class="actions">
+            <button class="btn-primary" type="submit">Dodaj</button>
+            <a th:href="@{/home}" class="btn-secondary">Anuluj</a>
         </div>
-    </div>
+
+        <p class="error-msg"   th:if="${error}"   th:text="${error}"></p>
+        <p class="success-msg" th:if="${success}" th:text="${success}"></p>
+    </form>
 </div>
+
 </body>
 </html>

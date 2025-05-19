@@ -1,57 +1,50 @@
 <!DOCTYPE html>
-<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+<html lang="pl" xmlns:th="https://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
-    <meta name="description" content="Weryfikacja dwuetapowa - StudyFlow">
-    <meta name="keywords" content="mfa, kod, logowanie, StudyFlow">
-    <title>Weryfikacja dwuetapowa - StudyFlow</title>
-    <link rel="stylesheet" th:href="@{/css/styleLogin.css}" />
-    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <title>Weryfikacja MFA – StudyFlow</title>
+
+    <!-- favicon -->
+    <link rel="icon" th:href="@{/favicon.ico}" type="image/x-icon">
+
+    <!-- wspólny arkusz auth -->
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+    <script defer th:src="@{/js/verifyMfa.js}"></script>
 </head>
 <body>
-<div id="Page_topbar">
-    <img class="Logo-small" th:src="@{/img/logo.svg}" alt="StudyFlow Logo">
+
+<div id="TopBar">
+    <img class="logo" th:src="@{/img/logo.svg}" alt="logo">
 </div>
-<div id="container">
-    <div id="root">
-        <div class="PageContainer">
-            <section class="Login-section">
-                <section class="ContainerBox">
-                    <h1 class="Login-Title">Weryfikacja dwuetapowa</h1>
 
-                    <p style="font-size: 1.15em; font-weight: 500; margin-bottom: 1.5em; text-align: center;">
-                        Na adres e-mail podany podczas rejestracji został wysłany 6-cyfrowy kod weryfikacyjny. <br>
-                        Kod jest ważny przez 5 minut. <br>
-                        Wpisz go poniżej, aby zakończyć logowanie.
-                    </p>
+<div class="card-wrap">
+    <h2 class="card-title">Potwierdź logowanie</h2>
 
-                    <div th:if="${error}"
-                         style="color:red; font-weight:bold; margin-bottom:1em;">
-                        <span th:text="${error}"></span>
-                    </div>
+    <!-- info o wysyłce kodu  -->
+    <p class="info-msg">
+        Na Twój adres e-mail wysłaliśmy jednorazowy kod (ważny 5&nbsp;minut).
+        Wpisz go poniżej, aby dokończyć logowanie.
+    </p>
 
-                    <form class="Login-form" th:action="@{/verify-mfa}" method="post">
-                        <div class="Input-container">
-                            <input class="Input_input"
-                                   type="text"
-                                   name="mfaCode"
-                                   placeholder="Wprowadź kod MFA"
-                                   required />
-                        </div>
+    <form class="auth-form" th:action="@{/verify-mfa}" method="post">
 
-                        <div class="Login-formOptions">
-                            <button class="ButtonLogin" type="submit">Zatwierdź</button>
-                            <div class="Login-optionlink">
-                                <a th:href="@{/login}">Powrót do logowania</a>
-                            </div>
-                        </div>
-                    </form>
-                </section>
-
-                <img class="Login-logo" th:src="@{/img/logo.svg}" alt="StudyFlow Logo">
-            </section>
+        <div class="field">
+            <label>Kod 6-cyfrowy</label>
+            <input type="text" name="code" pattern="[0-9]{6}" maxlength="6"
+                   inputmode="numeric" autocomplete="one-time-code" required>
         </div>
-    </div>
+
+        <button class="btn-primary">Zweryfikuj</button>
+
+        <p class="error-msg"   th:if="${error}"   th:text="${error}"></p>
+        <p class="success-msg" th:if="${success}" th:text="${success}"></p>
+    </form>
+
+    <p class="note">
+        Nie otrzymałeś kodu?
+        <a th:href="@{/verify-mfa/resend}">Wyślij ponownie</a>
+    </p>
 </div>
+
 </body>
 </html>
