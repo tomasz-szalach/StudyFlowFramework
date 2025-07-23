@@ -1,7 +1,5 @@
 package com.example.studyflowframework.controller;
 
-import com.example.studyflowframework.config.RedisPublisher;
-import com.example.studyflowframework.model.User;
 import com.example.studyflowframework.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.*;
@@ -22,77 +20,55 @@ import java.util.List;
 public class RegistrationController {
 
     private final UserService userService;
-    private final RedisPublisher redisPublisher; // Nowy komponent
 
     @Autowired
-    public RegistrationController(UserService userService,
-                                  RedisPublisher redisPublisher) {
+    public RegistrationController(UserService userService) {
         this.userService = userService;
-        this.redisPublisher = redisPublisher; // Inicjalizacja pola
     }
 
-    /**
-     * Wyświetla formularz rejestracji użytkownika.
-     *
-     * @return Nazwa widoku registration.html.
-     */
+    /* ---------- GET: formularz ---------- */
     @Operation(summary = "Wyświetla formularz rejestracji użytkownika")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Formularz rejestracji wyświetlony pomyślnie"),
-            @ApiResponse(responseCode = "401", description = "Nieautoryzowany dostęp")
-    })
+    @ApiResponse(responseCode = "200", description = "Formularz wyświetlony")
     @GetMapping("/registrationUser")
     public String showRegistrationForm() {
         return "registration";
     }
 
-    /**
-     * Przetwarza formularz rejestracji użytkownika.
-     *
-     * @param email     Email użytkownika.
-     * @param password  Hasło użytkownika.
-     * @param password2 Potwierdzenie hasła użytkownika.
-     * @param model     Model do przekazania danych do widoku.
-     * @return Widok rejestracji z komunikatami lub redirect do logowania.
-     */
+    /* ---------- POST: przetwarzanie ---------- */
     @Operation(summary = "Przetwarza rejestrację nowego użytkownika")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Rejestracja przetworzona, formularz z komunikatami"),
-            @ApiResponse(responseCode = "302", description = "Rejestracja zakończona, przekierowanie do logowania"),
-            @ApiResponse(responseCode = "400", description = "Nieprawidłowe dane wejściowe"),
-            @ApiResponse(responseCode = "401", description = "Nieautoryzowany dostęp")
+    @ApiResponses({
+            @ApiResponse(responseCode = "302", description = "Sukces → redirect /login"),
+            @ApiResponse(responseCode = "200", description = "Błąd walidacji → powrót do formularza")
     })
     @PostMapping("/registrationUser")
     public String processRegistration(
             @RequestParam String email,
             @RequestParam String password,
             @RequestParam String password2,
-            Model model
-    ) {
+            Model model) {
+
         List<String> messages = new ArrayList<>();
 
-        // Walidacja
+        /* ①  czy hasła identyczne */
         if (!password.equals(password2)) {
             messages.add("Hasła nie są takie same!");
-            model.addAttribute("messages", messages);
-            return "registration";
         }
 
-        // Sprawdzenie, czy email już istnieje
+        /* ②  email unikalny */
         if (userService.ifContainsEmail(email)) {
             messages.add("Użytkownik o tym emailu już istnieje!");
+        }
+
+        /* ③  ewentualne błędy → powrót do formularza */
+        if (!messages.isEmpty()) {
             model.addAttribute("messages", messages);
             return "registration";
         }
 
-        // Tworzenie nowego użytkownika z rolą USER
-        User user = new User(email, password, "USER");
-        userService.saveUser(user);
+        /* ④  tworzymy konto (rola USER, imię/nazwisko puste) */
+        userService.register(email, password, "", "");
 
-        // Publikacja rejestracji do Redis
-        redisPublisher.publishUserRegistration(email);
-
-        // Redirect do strony logowania
-        return "redirect:/login";
+        /* ⑤  redirect do logowania */
+        return "redirect:/login?registered";
     }
 }

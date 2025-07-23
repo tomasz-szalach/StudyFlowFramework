@@ -227,9 +227,9 @@ public class TaskRestController {
             return ResponseEntity.notFound().build();
         }
 
-        String current = task.getStatus();
+        String current = task.getStatus();          // "todo" | "completed"
         String newStatus = current.equals("completed") ? "todo" : "completed";
-        taskService.updateTaskStatus(taskId, newStatus);
+        taskService.updateTaskStatus(taskId, newStatus);   // ← przekazujemy String
 
         return ResponseEntity.ok(newStatus);
     }

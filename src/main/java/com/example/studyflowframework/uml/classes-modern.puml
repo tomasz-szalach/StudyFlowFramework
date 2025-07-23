@@ -1,0 +1,67 @@
+@startuml
+' ──────────────────────────────────────────────────────────────
+'  Nowocześniejszy wygląd:  kolor, zaokrąglenia, ikony, układ
+' ──────────────────────────────────────────────────────────────
+' 1) motyw + czcionki
+!theme spacelab                   ' (inne: cerulean, minty, dark …)
+skinparam defaultFontName  "Segoe UI"
+skinparam defaultFontSize  13
+
+' 2) klasy – zaokrąglenia, cienie, kolory atrybutów
+skinparam class {
+  BackgroundColor #FAFAFA
+  BorderColor     #444
+  ArrowColor      #444
+  RoundCorner     14
+  Shadowing       true
+  AttributeIconSize 0
+  '             ⚙ = public  🔒 = private
+  AttributeStyle      italic
+  AttributeFontColor  #1565C0
+}
+
+' 3) wyłączamy metody (czytelniej przy dużych klasach)
+hide methods
+
+' 4) układ → poziomy (łatwiejszy do czytania)
+left to right direction
+
+' ─── KLASY ────────────────────────────────────────────────────
+class User      << (C,#1976D2) >> {
+  - id          : Long
+  - email       : String
+  - password    : String
+  - role        : String
+  - createdAt   : LocalDateTime
+}
+
+class TaskList  << (C,#388E3C) >> {
+  - id      : Long
+  - name    : String
+  - userId  : Long
+}
+
+class Task      << (C,#F57C00) >> {
+  - id          : Long
+  - name        : String
+  - description : String
+  - dueDate     : String
+  - status      : String
+  - priority    : Priority
+  - userId      : Long
+  - taskListId  : Long
+}
+
+' ─── RELACJE ───────────────────────────────────────────────────
+User     "1"  -- "many" TaskList  : posiada\nlisty
+TaskList "1"  -- "many" Task      : zawiera
+User     "1"  -- "many" Task      : właściciel
+
+' (opcjonalnie) ramka pakietu
+package "com.example.studyflowframework.model" {
+  User
+  TaskList
+  Task
+}
+
+@enduml

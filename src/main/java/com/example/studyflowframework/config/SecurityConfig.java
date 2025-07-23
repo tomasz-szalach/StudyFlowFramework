@@ -10,39 +10,32 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-
 /**
- * Konfiguracja Spring Security
+ * Konfiguracja Spring Security.
  */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-
+    /* ───────────────── PasswordEncoder ───────────────── */
     @Bean
     public PasswordEncoder passwordEncoder() {
+        // ⚠ produkcyjnie użyj BCryptPasswordEncoder
         return NoOpPasswordEncoder.getInstance();
     }
 
-    /**
-     * Bean CustomUserDetailsService z wstrzykniętym repo i encoderem
-     */
+    /* ───────────────── CustomUserDetailsService ───────────────── */
     @Bean
-    public CustomUserDetailsService customUserDetailsService(
-            UserRepository userRepository,
-            PasswordEncoder passwordEncoder
-    ) {
-        return new CustomUserDetailsService(userRepository, passwordEncoder);
+    public CustomUserDetailsService customUserDetailsService(UserRepository userRepository) {
+        // konstruktor ma 1 param
+        return new CustomUserDetailsService(userRepository);
     }
 
-    /**
-     * AuthenticationManager z userDetailsService i encoderem
-     */
+    /* ───────────────── AuthenticationManager ───────────────── */
     @Bean
     public AuthenticationManager authenticationManager(
             HttpSecurity http,
@@ -62,25 +55,27 @@ public class SecurityConfig {
 
     @Autowired
     private CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
-    /**
-     * Główna konfiguracja łańcucha filtrów i logowania
-     */
+
+    /* ───────────────── Główny filtr ───────────────── */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // Ścieżki publiczne
-                        .requestMatchers("/error", "/login", "/css/**", "/js/**", "/img/**", "/registrationUser", "/verify-mfa")
-                        .permitAll()
-                        // Reszta wymaga autentykacji
+                        .requestMatchers(
+                                "/error",
+                                "/login",
+                                "/css/**",
+                                "/js/**",
+                                "/img/**",
+                                "/registrationUser",
+                                "/verify-mfa"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
-                        // Po błędnych danych -> ?error
                         .failureUrl("/login?error")
-                        // Po udanym logowaniu -> /home
                         .successHandler(customAuthenticationSuccessHandler)
                         .permitAll()
                 );

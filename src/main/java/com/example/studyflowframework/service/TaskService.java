@@ -6,71 +6,50 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
-/**
- * Serwis do zarządzania encjami Task (dodawanie, pobieranie, wyszukiwanie, toggle, usuwanie).
- */
 @Service
 public class TaskService {
 
-    private final TaskRepository taskRepository;
-
+    private final TaskRepository repo;
     @Autowired
-    public TaskService(TaskRepository taskRepository) {
-        this.taskRepository = taskRepository;
+    public TaskService(TaskRepository repo){ this.repo = repo; }
+
+    /* ========== dodawanie ========== */
+    @Transactional
+    public void addTask(String name,String desc,String due,
+                        Short statusId,Long listId,Long reporterId,
+                        Short priorityId){
+        Task t = new Task(name,desc,LocalDate.parse(due),
+                reporterId,listId,priorityId,statusId);
+        repo.save(t);
     }
+
+    /* ========== pobieranie ========== */
+    public List<Task> getTasksByUserId(Long uid){      // dla AccountController
+        return repo.findByReporterId(uid);
+    }
+    public List<Task> getTasksByTaskList(Long listId, Long uid){
+        return repo.findByTaskListIdAndReporterIdOrderByDueDateAsc(listId,uid);
+    }
+    public List<Task> searchTasksInList(Long listId, Long uid, String q){
+        return repo.searchTasks(q==null?"":q, listId, uid);
+    }
+    public Task getTaskById(Long id){ return repo.findById(id).orElse(null); }
+
+    /* ========== status ========== */
+    private static final Map<String,Short> STATUS =
+            Map.of("todo",(short)1,"in_progress",(short)2,
+                    "completed",(short)3,"archived",(short)4);
 
     @Transactional
-    public String addTask(String name, String description, String dueDate,
-                          String status, Long taskListId, Long userId,
-                          Task.Priority priority) {
-
-        Task task = new Task(name, description, dueDate,
-                status, userId, taskListId, priority);
-
-        taskRepository.save(task);
-        return "Zadanie zostało dodane pomyślnie.";
+    public void updateTaskStatus(Long id, String code){
+        repo.updateTaskStatus(id, STATUS.getOrDefault(code,(short)1));
     }
 
-    public List<Task> getTasksByUserId(Long userId) {
-        return taskRepository.findByUserId(userId);
-    }
-
-    /**
-     * Teraz korzystamy z findByTaskListIdAndUserIdOrderByDueDateAsc
-     * (zamiast starego findByTaskListIdAndUserId).
-     */
-    public List<Task> getTasksByTaskList(Long listId, Long userId) {
-        return taskRepository.findByTaskListIdAndUserIdOrderByDueDateAsc(listId, userId);
-    }
-
-    /**
-     * Wyszukiwanie w obrębie listy z sortowaniem rosnąco po dueDate.
-     */
-    public List<Task> searchTasksInList(Long listId, Long userId, String query) {
-        if (query == null) {
-            query = "";
-        }
-        return taskRepository.searchTasks(query, listId, userId);
-    }
-
-    public Task getTaskById(Long taskId) {
-        return taskRepository.findById(taskId).orElse(null);
-    }
-
-    @Transactional
-    public void updateTaskStatus(Long taskId, String status) {
-        taskRepository.updateTaskStatus(taskId, status);
-    }
-
-    @Transactional
-    public Task saveTask(Task task) {
-        return taskRepository.save(task);
-    }
-
-    @Transactional
-    public void deleteTask(Long taskId) {
-        taskRepository.deleteById(taskId);
-    }
+    /* ========== save / delete ========== */
+    @Transactional public Task saveTask(Task t){ return repo.save(t); }
+    @Transactional public void deleteTask(Long id){ repo.deleteById(id); }
 }

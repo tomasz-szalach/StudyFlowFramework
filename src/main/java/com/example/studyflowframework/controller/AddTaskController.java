@@ -1,14 +1,10 @@
 package com.example.studyflowframework.controller;
 
-import com.example.studyflowframework.model.Task;
 import com.example.studyflowframework.model.TaskList;
 import com.example.studyflowframework.model.User;
+import com.example.studyflowframework.repository.UserRepository;
 import com.example.studyflowframework.service.TaskListService;
 import com.example.studyflowframework.service.TaskService;
-import com.example.studyflowframework.repository.UserRepository;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.*;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,84 +14,62 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * Dodawanie nowego zadania (addTaskPage.html)
- */
 @Controller
-@Tag(name = "Task Management", description = "Operacje związane z zarządzaniem zadaniami")
 public class AddTaskController {
 
     private final TaskListService taskListService;
-    private final TaskService taskService;
-    private final UserRepository userRepository;
+    private final TaskService     taskService;
+    private final UserRepository  userRepo;
 
     @Autowired
-    public AddTaskController(TaskListService taskListService,
-                             TaskService taskService,
-                             UserRepository userRepository) {
-        this.taskListService = taskListService;
-        this.taskService = taskService;
-        this.userRepository = userRepository;
+    public AddTaskController(TaskListService tls,
+                             TaskService     ts,
+                             UserRepository  ur) {
+        this.taskListService = tls;
+        this.taskService     = ts;
+        this.userRepo        = ur;
     }
 
-    /**
-     * Formularz do dodawania zadania
-     */
-    @Operation(summary = "Wyświetla formularz do dodawania nowego zadania")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Formularz wyświetlony pomyślnie"),
-            @ApiResponse(responseCode = "401", description = "Nieautoryzowany dostęp")
-    })
+    /* ---------- formularz ---------- */
     @GetMapping("/addTaskPage")
-    public String showAddTaskPage(Model model) {
-        // 1. Email
+    public String form(Model m) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        // 2. userId
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
-        Long userId = user.getId();
+        User   user  = userRepo.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException(email));
 
-        // 3. listy zadań -> wyświetlane w <select> w addTaskPage
-        List<TaskList> userLists = taskListService.getAllTaskLists(userId);
-        model.addAttribute("taskLists", userLists);
+        List<TaskList> lists = taskListService.getAllTaskLists(user.getId());
+        m.addAttribute("taskLists", lists);
         return "addTaskPage";
     }
 
-    /**
-     * Obsługuje formularz dodawania nowego zadania
-     *
-     * @param name        Nazwa zadania
-     * @param description Opis zadania
-     * @param due_date    Data wykonania zadania
-     * @param task_list_id ID listy zadań
-     * @return Redirect do strony głównej
-     */
-    @Operation(summary = "Dodaje nowe zadanie do określonej listy zadań")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "302", description = "Zadanie dodane, przekierowanie do strony głównej"),
-            @ApiResponse(responseCode = "400", description = "Nieprawidłowe dane wejściowe"),
-            @ApiResponse(responseCode = "401", description = "Nieautoryzowany dostęp"),
-            @ApiResponse(responseCode = "404", description = "Nieznaleziony użytkownik")
-    })
+    /* ---------- POST ---------- */
     @PostMapping("/addTask")
     public String addTask(@RequestParam String name,
                           @RequestParam String description,
-                          @RequestParam String due_date,
+                          @RequestParam String due_date,        // yyyy‑MM‑dd
                           @RequestParam Long   task_list_id,
-                          @RequestParam(name="priority", defaultValue = "low") String prio) {
+                          @RequestParam(name="priority",
+                                  defaultValue = "low") String prio) {
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
+        User   user  = userRepo.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException(email));
+
+        /* mapowanie priorytetu code → ID */
+        short prioId = switch (prio.toLowerCase()) {
+            case "medium" -> 2;
+            case "high"   -> 3;
+            default       -> 1;     // low
+        };
 
         taskService.addTask(
                 name,
                 description,
                 due_date,
-                "todo",
+                (short) 1,          // status_id = 1  (“todo”)
                 task_list_id,
                 user.getId(),
-                Task.Priority.valueOf(prio.toUpperCase())        // LOW | MEDIUM | HIGH
+                prioId
         );
         return "redirect:/home";
     }

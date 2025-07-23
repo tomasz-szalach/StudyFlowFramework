@@ -6,54 +6,61 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
-/** Model reprezentujący użytkownika. */
 @Entity
 @Table(name = "users")
 @Schema(description = "Model reprezentujący użytkownika")
 public class User {
 
-    /* ───────── pola ───────── */
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Schema(description = "Unikalny identyfikator użytkownika", example = "1")
+    /* ---------- kolumny ---------- */
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Long id;
 
     @Column(nullable = false, unique = true)
-    @Schema(description = "Adres e-mail użytkownika", example = "user@example.com")
     private String email;
 
     @Column(nullable = false)
-    @Schema(description = "Hasło (hash) użytkownika")
     private String password;
 
-    @Column(nullable = false)
-    @Schema(description = "Rola użytkownika", example = "USER")
-    private String role;
+    @Column(name = "first_name", length = 64)
+    private String firstName;
 
-    /*  NOWE  */
-    @CreationTimestamp                      // automatycznie wstawia bieżący czas
-    @Column(name = "created_at",
-            nullable = false, updatable = false)
-    @Schema(description = "Data dołączenia", example = "2025-05-18T15:12:07")
+    @Column(name = "last_name",  length = 64)
+    private String lastName;
+
+    /* === FK → user_roles.role_id === */
+    @ManyToOne(fetch = FetchType.LAZY)               // LAZY = bez dodatkowych JOIN‑ów
+    @JoinColumn(name = "role_id", nullable = false)  // NOT NULL
+    private UserRole role;
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    /* ───────── konstruktory ───────── */
-    public User() {}
-    public User(String email, String password, String role){
-        this.email = email;
-        this.password = password;
-        this.role = role;
+    /* ---------- konstruktory ---------- */
+    public User() {}                                 // JPA
+
+    public User(String email, String password, UserRole role,
+                String firstName, String lastName) {
+        this.email      = email;
+        this.password   = password;
+        this.role       = role;
+        this.firstName  = firstName;
+        this.lastName   = lastName;
     }
 
-    /* ───────── get / set ───────── */
+    /* ---------- get / set ---------- */
     public Long          getId()        { return id; }
     public String        getEmail()     { return email; }
     public String        getPassword()  { return password; }
-    public String        getRole()      { return role; }
+    public String        getFirstName() { return firstName; }
+    public String        getLastName()  { return lastName; }
+    public UserRole      getRole()      { return role; }
     public LocalDateTime getCreatedAt() { return createdAt; }
 
-    public void setId(Long id)           { this.id = id; }
-    public void setEmail(String email)   { this.email = email; }
-    public void setPassword(String pass) { this.password = pass; }
-    public void setRole(String role)     { this.role = role; }
+    public void setEmail(String e)      { this.email = e; }
+    public void setPassword(String p)   { this.password = p; }
+    public void setFirstName(String fn) { this.firstName = fn; }
+    public void setLastName(String ln)  { this.lastName = ln; }
+    public void setRole(UserRole r)     { this.role = r; }
 }

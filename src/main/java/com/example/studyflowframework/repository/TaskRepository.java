@@ -8,43 +8,33 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-/**
- * Repozytorium do zarządzania encjami Task.
- */
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {
 
-    List<Task> findByUserId(Long userId);
+    /* reporterId = dawne userId */
+    List<Task> findByReporterId(Long reporterId);
 
-    List<Task> findByTaskListIdAndUserIdOrderByDueDateAsc(Long taskListId, Long userId);
+    List<Task> findByTaskListIdAndReporterIdOrderByDueDateAsc(Long taskListId,
+                                                              Long reporterId);
 
     @Query("""
-        SELECT t
-        FROM Task t
+        SELECT t FROM Task t
         WHERE t.taskListId = :taskListId
-          AND t.userId = :userId
+          AND t.reporterId = :reporterId
           AND (
-            :query = ''
-            OR LOWER(t.name) LIKE LOWER(CONCAT('%', :query, '%'))
-            OR LOWER(t.description) LIKE LOWER(CONCAT('%', :query, '%'))
+              :query = ''
+              OR LOWER(t.name)        LIKE LOWER(CONCAT('%',:query,'%'))
+              OR LOWER(t.description) LIKE LOWER(CONCAT('%',:query,'%'))
           )
-        ORDER BY t.dueDate ASC
+        ORDER BY t.dueDate
     """)
-    List<Task> searchTasks(
-            @Param("query") String query,
-            @Param("taskListId") Long taskListId,
-            @Param("userId") Long userId
-    );
+    List<Task> searchTasks(@Param("query")      String query,
+                           @Param("taskListId") Long   taskListId,
+                           @Param("reporterId") Long   reporterId);
 
-    /**
-     * Aktualizacja statusu zadania (np. toggle).
-     */
-    @Transactional
-    @Modifying
-    @Query("UPDATE Task t SET t.status = :status WHERE t.id = :taskId")
-    void updateTaskStatus(@Param("taskId") Long taskId, @Param("status") String status);
-
-    /**
-     * Usuwanie zadania -> wbudowana metoda deleteById(taskId).
-     */
+    /* UPDATE – ustawiamy statusId (FK) */
+    @Transactional @Modifying
+    @Query("UPDATE Task t SET t.statusId = :statusId WHERE t.id = :taskId")
+    void updateTaskStatus(@Param("taskId") Long  taskId,
+                          @Param("statusId") Short statusId);
 }

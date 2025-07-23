@@ -4,43 +4,27 @@ import com.example.studyflowframework.model.User;
 import com.example.studyflowframework.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.*;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final UserRepository repo;
 
     @Autowired
-    public CustomUserDetailsService(UserRepository userRepository,
-                                    PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
+    public CustomUserDetailsService(UserRepository repo) { this.repo = repo; }
 
-    /**
-     * Główna metoda wywoływana przez Spring Security podczas logowania:
-     * - szuka usera w bazie po emailu
-     * - tworzy obiekt UserDetails
-     */
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Optional<User> opt = userRepository.findByEmail(email);
-        if (opt.isEmpty()) {
-            throw new UsernameNotFoundException("User not found for email: " + email);
-        }
+    public UserDetails loadUserByUsername(String email)
+            throws UsernameNotFoundException {
 
-        User userEntity = opt.get();
+        User u = repo.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException(email));
 
         return org.springframework.security.core.userdetails.User
-                .withUsername(userEntity.getEmail())
-                .password(userEntity.getPassword())  // {noop}password123
-                .roles(userEntity.getRole())         // ADMIN => ROLE_ADMIN
+                .withUsername(u.getEmail())
+                .password(u.getPassword())
+                .roles(u.getRole().getRoleCode())     // <<< pobieramy z obiektu
                 .build();
     }
-
 }

@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 
 /**
  * Model reprezentujący listę zadań.
+ * Po refaktorze DB: list_id, list_name, owner_id.
+ * Zachowujemy stare nazewnictwo pól (id, name, userId), żeby nie przepisywać całej aplikacji.
  */
 @Entity
 @Table(name = "task_lists")
@@ -13,15 +15,17 @@ public class TaskList {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Schema(description = "Unikalny identyfikator listy zadań", example = "1")
+    @Column(name = "list_id")
     private Long id;
 
-    @Schema(description = "Nazwa listy zadań", example = "Prace domowe")
+    @Column(name = "list_name")
     private String name;
 
-    @Schema(description = "ID użytkownika, do którego należy lista zadań", example = "1")
+    /** FK → users.user_id. Stary kod używał nazwy userId, więc ją zostawiamy. */
+    @Column(name = "owner_id")
     private Long userId;
 
+    /* ===== Konstruktory ===== */
     public TaskList() {
     }
 
@@ -36,8 +40,7 @@ public class TaskList {
         this.userId = userId;
     }
 
-    // Gettery i Settery
-
+    /* ===== Get / Set ===== */
     public Long getId() {
         return id;
     }
@@ -46,6 +49,7 @@ public class TaskList {
         return name;
     }
 
+    /** zgodność z wcześniejszym kodem */
     public Long getUserId() {
         return userId;
     }
@@ -58,6 +62,7 @@ public class TaskList {
         this.name = name;
     }
 
+    /** zgodność z wcześniejszym kodem */
     public void setUserId(Long userId) {
         this.userId = userId;
     }
