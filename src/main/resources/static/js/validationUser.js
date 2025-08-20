@@ -5,7 +5,7 @@ const nickInput = form.querySelector('input[name="username"]');
 const confirmedPasswordInput=form.querySelector('input[name="password2"]');
 
 function isEmail(email){
-    return /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email);
+    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
 }
 
 function isPassword(password){
