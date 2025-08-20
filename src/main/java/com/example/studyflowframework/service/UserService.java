@@ -16,10 +16,10 @@ import java.util.List;
 @Service
 public class UserService {
 
-    private final UserRepository    repo;
+    private final UserRepository     repo;
     private final UserRoleRepository roleRepo;
-    private final PasswordEncoder   encoder;
-    private final RedisPublisher    publisher;
+    private final PasswordEncoder    encoder;
+    private final RedisPublisher     publisher;
 
     @Autowired
     public UserService(UserRepository repo,
@@ -55,10 +55,14 @@ public class UserService {
         UserRole role = roleRepo.findByRoleCode("USER")
                 .orElseThrow();
 
+        // Używamy emaila jako username – gwarantuje unikalność kolumny.
+        String username = email;
+
         User u = new User(
+                username,
                 email,
                 encoder.encode(rawPwd),
-                role,                 // przekazujemy cały obiekt
+                role,
                 firstName,
                 lastName
         );
@@ -75,6 +79,8 @@ public class UserService {
     public void changeEmail(Long uid, String newEmail) {
         User u = repo.findById(uid).orElseThrow();
         u.setEmail(newEmail);
+        // jeśli chcesz trzymać regułę „username = email”, to odkomentuj:
+        // u.setUsername(newEmail);
         repo.save(u);
     }
 

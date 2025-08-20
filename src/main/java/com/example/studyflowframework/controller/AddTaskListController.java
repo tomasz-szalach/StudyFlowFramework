@@ -1,8 +1,8 @@
 package com.example.studyflowframework.controller;
 
 import com.example.studyflowframework.model.User;
-import com.example.studyflowframework.service.TaskListService;
 import com.example.studyflowframework.repository.UserRepository;
+import com.example.studyflowframework.service.TaskListService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,51 +33,55 @@ public class AddTaskListController {
         this.userRepository = userRepository;
     }
 
-    /**
-     * Wyświetla formularz do dodawania nowej listy zadań
-     *
-     * @return Nazwa widoku formularza
-     */
+    /* ───────── FORMULARZ ───────── */
+
     @Operation(summary = "Wyświetla formularz do dodawania nowej listy zadań")
-    @ApiResponses(value = {
+    @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Formularz wyświetlony pomyślnie"),
             @ApiResponse(responseCode = "401", description = "Nieautoryzowany dostęp")
     })
     @GetMapping("/addTaskList")
     public String showAddTaskListForm() {
-        return "addTaskList"; // resources/templates/addTaskList.html
+        return "addTaskList";            // resources/templates/addTaskList.html
     }
 
-    /**
-     * Tworzy nową listę zadań dla zalogowanego użytkownika
-     *
-     * @param name  Nazwa nowej listy zadań
-     * @param model Model do przekazania danych do widoku
-     * @return Redirect do strony głównej
-     */
+    /* ───────── ZAPIS  (główne POST) ───────── */
+
     @Operation(summary = "Tworzy nową listę zadań dla zalogowanego użytkownika")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "302", description = "Lista zadań utworzona, przekierowanie do strony głównej"),
+    @ApiResponses({
+            @ApiResponse(responseCode = "302", description = "Lista zadań utworzona; przekierowanie do strony głównej"),
             @ApiResponse(responseCode = "400", description = "Nieprawidłowe dane wejściowe"),
             @ApiResponse(responseCode = "401", description = "Nieautoryzowany dostęp"),
             @ApiResponse(responseCode = "404", description = "Nieznaleziony użytkownik")
     })
     @PostMapping("/createTaskList")
     public String createTaskList(@RequestParam String name, Model model) {
-        // 1. Pobierz email z kontekstu
+        createTaskListInternal(name);
+        return "redirect:/home";
+    }
+
+    /* ───────── ALIAS  (POST /addTaskList) ───────── */
+
+    /** Obsługuje formularz wysyłany na /addTaskList (alias); wywołuje logikę createTaskList */
+    @PostMapping("/addTaskList")
+    public String createTaskListAlias(@RequestParam String name, Model model) {
+        createTaskListInternal(name);
+        return "redirect:/home";
+    }
+
+    /* ───────── PRYWATNA LOGIKA ───────── */
+
+    /** Wspólna część dodawania listy */
+    private void createTaskListInternal(String name) {
+        // 1. Pobierz e-mail zalogowanego użytkownika
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        // 2. Znajdź usera, by mieć userId
+
+        // 2. Znajdź użytkownika, aby uzyskać userId
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
         Long userId = user.getId();
 
-        // (ew. messages)
-        List<String> messages = new ArrayList<>();
-
-        // 3. Tworzymy listę zadań
+        // 3. Dodaj listę zadań
         taskListService.addTaskList(name, userId);
-
-        // 4. Redirect do /home
-        return "redirect:/home";
     }
 }

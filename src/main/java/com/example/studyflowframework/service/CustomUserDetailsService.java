@@ -2,6 +2,7 @@ package com.example.studyflowframework.service;
 
 import com.example.studyflowframework.model.User;
 import com.example.studyflowframework.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Autowired
     public CustomUserDetailsService(UserRepository repo) { this.repo = repo; }
 
+    @Transactional
     @Override
     public UserDetails loadUserByUsername(String email)
             throws UsernameNotFoundException {

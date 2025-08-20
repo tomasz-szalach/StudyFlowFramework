@@ -1,0 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap');
+
+:root{
+    --acc:#1f89bf;
+    --bg:#f0f2f5;
+    --bg-card:#fff;
+    --border:#dadde1;
+    --radius:1rem;
+    --font:'Quicksand',sans-serif;
+}
+
+body{margin:0;font:400 16px var(--font);background:var(--bg);color:#333}
+
+/* ░░ karta + F A D E - I N ░░ */
+.card-wrap{
+    max-width:940px;
+    margin:24px auto 32px;
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    box-shadow:0 8px 28px rgba(0,0,0,.08);
+    padding:32px 40px;
+    animation:fadeIn .35s cubic-bezier(.25,.8,.25,1);
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px)}}
+
+.card-title{
+    margin-top:0;text-align:center;font:600 24px var(--font);
+}
+
+/* --- układ & pola ------------------------------------ */
+.task-form{display:grid;grid-template-columns:1fr 1fr;column-gap:48px}
+
+.form-col label{
+    display:flex;flex-direction:column;gap:8px;
+    font:600 1.35rem var(--font);
+    margin-bottom:24px;
+}
+
+input,select,textarea{
+    font:400 14px var(--font);padding:10px 12px;
+    border:1px solid var(--border);border-radius:8px;
+}
+input:focus,select:focus,textarea:focus{
+    outline:none;border-color:var(--acc);
+    box-shadow:0 0 0 3px rgba(31,137,191,.18)
+}
+
+textarea{
+    resize:none;min-height:220px;max-height:220px;overflow:auto
+}
+textarea.error{
+    border-color:#d03c3c;box-shadow:0 0 0 2px rgba(208,60,60,.35)
+}
+
+/* --- przyciski --------------------------------------- */
+.actions{grid-column:1/-1;display:flex;gap:1rem;justify-content:flex-end;margin-top:6px}
+
+.btn-primary,.btn-secondary{
+    font:600 14px var(--font);padding:10px 26px;border-radius:8px;
+    border:none;cursor:pointer;text-decoration:none;text-align:center
+}
+.btn-primary{background:var(--acc);color:#fff}.btn-primary:hover{background:#186d97}
+.btn-secondary{background:#e5e7ea;color:#333}.btn-secondary:hover{background:#d6dade}
+
+/* --- licznik znaków ---------------------------------- */
+.counter{font:400 12px var(--font);color:#666;margin-top:4px;align-self:flex-end}
+.counter.over{color:#d03c3c}

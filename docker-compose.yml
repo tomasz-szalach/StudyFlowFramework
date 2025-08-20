@@ -1,16 +1,42 @@
 version: '3.8'
 
 services:
-  db:
-    build:
-      context: .
-      dockerfile: docker/db/Dockerfile
+  postgres-primary:
+    image: bitnami/postgresql:16
+    container_name: pg-primary
+    environment:
+      - POSTGRESQL_POSTGRES_PASSWORD=postgres
+      - POSTGRESQL_USERNAME=docker
+      - POSTGRESQL_PASSWORD=docker
+      - POSTGRESQL_DATABASE=db
+      - POSTGRESQL_REPLICATION_MODE=master
+      - POSTGRESQL_REPLICATION_USER=replicator
+      - POSTGRESQL_REPLICATION_PASSWORD=replpass
     ports:
       - "5432:5432"
-    networks:
-      - pg-network
     volumes:
-      - pg-data:/var/lib/postgresql/data
+      - pg_primary_data:/bitnami/postgresql
+    networks: [ pgnet ]
+
+  postgres-replica:
+    image: bitnami/postgresql:16
+    container_name: pg-replica
+    depends_on:
+      - postgres-primary
+    environment:
+      - POSTGRESQL_USERNAME=docker
+      - POSTGRESQL_PASSWORD=docker
+      - POSTGRESQL_DATABASE=db
+      - POSTGRESQL_REPLICATION_MODE=slave
+      - POSTGRESQL_PRIMARY_HOST=postgres-primary
+      - POSTGRESQL_PRIMARY_PORT_NUMBER=5432
+      - POSTGRESQL_REPLICATION_USER=replicator
+      - POSTGRESQL_REPLICATION_PASSWORD=replpass
+    ports:
+      - "5433:5432"
+    volumes:
+      - pg_replica_data:/bitnami/postgresql
+    networks: [ pgnet ]
 
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -20,19 +46,18 @@ services:
       PGADMIN_DEFAULT_PASSWORD: admin
     ports:
       - "5050:80"
-    networks:
-      - pg-network
+    networks: [ pgnet ]
 
   redis:
     image: redis:latest
     container_name: redis
     ports:
       - "6379:6379"
-    networks:
-      - pg-network
+    networks: [ pgnet ]
 
 networks:
-  pg-network:
+  pgnet:
 
 volumes:
-  pg-data:
+  pg_primary_data:
+  pg_replica_data:
